@@ -1,73 +1,136 @@
-# Welcome to your Lovable project
 
-## Project info
+# VehicleHub - Vehicle Marketplace
 
-**URL**: https://lovable.dev/projects/e50b1c04-3bda-42de-be15-6985a4f9346f
+A modern, responsive vehicle marketplace built with React, TypeScript, and Tailwind CSS. Buy and sell cars, bikes, and auto accessories across India.
 
-## How can I edit this code?
+## 🚀 Features
 
-There are several ways of editing your application.
+- **Vehicle Listings**: Browse cars and bikes with advanced filtering
+- **Accessories Store**: Shop for auto accessories with ratings and reviews
+- **Responsive Design**: Mobile-first design that works on all devices
+- **Contact Forms**: Validated contact forms with Indian phone number support
+- **Authentication**: Sign in with magic links or email/password
+- **Modern UI**: Beautiful gradient designs and smooth animations
 
-**Use Lovable**
+## 🛠️ Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/e50b1c04-3bda-42de-be15-6985a4f9346f) and start prompting.
+- **Frontend**: React 18, TypeScript, Vite
+- **Styling**: Tailwind CSS, shadcn/ui components
+- **Routing**: React Router DOM
+- **State Management**: TanStack Query
+- **Forms**: React Hook Form with Zod validation
+- **Icons**: Lucide React
+- **Backend**: Supabase integration ready
 
-Changes made via Lovable will be committed automatically to this repo.
+## 📱 Pages
 
-**Use your preferred IDE**
+- **Home**: Hero section with featured vehicles and stats
+- **Vehicles**: Browse cars and bikes with filters
+- **Accessories**: Shop auto accessories by category
+- **About**: Company story, team, and values
+- **Contact**: Contact form with multiple office locations
+- **Sign In**: Authentication with magic links and email/password
+- **404**: Custom not found page
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🎨 Design Features
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Mobile-first responsive design
+- Gradient backgrounds and modern card layouts
+- Smooth hover animations and transitions
+- Indian currency formatting (₹)
+- Professional typography with proper hierarchy
+- Accessibility-focused components
 
-Follow these steps:
+## 🚀 Getting Started
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+2. **Start development server:**
+   ```bash
+   npm run dev
+   ```
 
-# Step 3: Install the necessary dependencies.
-npm i
+3. **Build for production:**
+   ```bash
+   npm run build
+   ```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+## 📊 Components
+
+### Core Components
+- `Navbar` - Responsive navigation with mobile menu
+- `Footer` - Company links and contact information
+- `VehicleCard` - Vehicle listing card with details
+- `FiltersPanel` - Advanced filtering for vehicles
+- `ContactForm` - Validated contact form
+
+### UI Components
+- Built on shadcn/ui component library
+- Custom styled buttons, inputs, cards
+- Responsive grid layouts
+- Loading states and animations
+
+## 🔧 Configuration
+
+### Environment Variables (Supabase)
+```env
+VITE_SUPABASE_URL=your_supabase_url
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-**Edit a file directly in GitHub**
+### Tailwind Configuration
+- Custom color palette with gradients
+- Extended animations and transitions
+- Responsive breakpoints
+- Component-specific utilities
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 🗃️ Database Schema (Supabase)
 
-**Use GitHub Codespaces**
+The application is ready for Supabase integration with the following tables:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- **vehicles**: Cars and bikes listings
+- **accessories**: Auto accessories with ratings
+- **contact_submissions**: Contact form submissions
+- **users**: User authentication (handled by Supabase Auth)
 
-## What technologies are used for this project?
+## 📈 Performance
 
-This project is built with:
+- Optimized images with proper loading
+- Lazy loading for components
+- Efficient state management
+- Mobile-optimized performance
+- SEO-friendly meta tags
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🔒 Security
 
-## How can I deploy this project?
+- Input validation with Zod schemas
+- XSS protection in forms
+- Secure authentication flow
+- Environment variable protection
 
-Simply open [Lovable](https://lovable.dev/projects/e50b1c04-3bda-42de-be15-6985a4f9346f) and click on Share -> Publish.
+## 🌐 SEO & Accessibility
 
-## Can I connect a custom domain to my Lovable project?
+- Semantic HTML structure
+- Proper heading hierarchy
+- Alt tags for images
+- ARIA labels where needed
+- Meta tags for social sharing
 
-Yes, you can!
+## 🚀 Deployment
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+The application is ready for deployment on platforms like:
+- Vercel (recommended for Vite apps)
+- Netlify
+- Railway
+- Any static hosting service
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## 📝 License
+
+This project is built with Lovable AI and is ready for commercial use.
+
+---
+
+**Generated by Lovable AI** - Your AI-powered development assistant
