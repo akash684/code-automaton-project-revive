@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Search, Star, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -14,7 +13,7 @@ const Accessories = () => {
   const [accessories, setAccessories] = useState<Accessory[]>([]);
   const [filteredAccessories, setFilteredAccessories] = useState<Accessory[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('price-low');
   const [loading, setLoading] = useState(true);
 
@@ -111,7 +110,7 @@ const Accessories = () => {
     let filtered = accessories.filter(accessory => {
       const matchesSearch = accessory.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           accessory.brand?.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = !selectedCategory || accessory.category === selectedCategory;
+      const matchesCategory = selectedCategory === 'all' || accessory.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
 
@@ -190,7 +189,7 @@ const Accessories = () => {
                   <SelectValue placeholder="All Categories" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
                   <SelectItem value="Interior">Interior</SelectItem>
                   <SelectItem value="Exterior">Exterior</SelectItem>
                   <SelectItem value="Electronics">Electronics</SelectItem>
@@ -265,13 +264,13 @@ const Accessories = () => {
             ))}
           </div>
 
-          {filteredAccessories.length === 0 && (
+          {filteredAccessories.length === 0 && !loading && (
             <div className="text-center py-16">
               <p className="text-xl text-gray-600">No accessories found matching your criteria.</p>
               <Button
                 onClick={() => {
                   setSearchTerm('');
-                  setSelectedCategory('');
+                  setSelectedCategory('all');
                   setSortBy('price-low');
                 }}
                 className="mt-4"

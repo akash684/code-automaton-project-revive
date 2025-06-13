@@ -9,9 +9,9 @@ import { Slider } from '@/components/ui/slider';
 const FiltersPanel = () => {
   const [priceRange, setPriceRange] = useState([100000, 2000000]);
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-  const [vehicleType, setVehicleType] = useState('');
-  const [fuelType, setFuelType] = useState('');
-  const [transmission, setTransmission] = useState('');
+  const [vehicleType, setVehicleType] = useState('all');
+  const [fuelType, setFuelType] = useState('all');
+  const [transmission, setTransmission] = useState('all');
 
   const brands = ['Maruti Suzuki', 'Honda', 'Hyundai', 'Toyota', 'Royal Enfield', 'Bajaj', 'TVS'];
 
@@ -34,9 +34,9 @@ const FiltersPanel = () => {
   const clearFilters = () => {
     setPriceRange([100000, 2000000]);
     setSelectedBrands([]);
-    setVehicleType('');
-    setFuelType('');
-    setTransmission('');
+    setVehicleType('all');
+    setFuelType('all');
+    setTransmission('all');
   };
 
   return (
@@ -49,7 +49,7 @@ const FiltersPanel = () => {
             <SelectValue placeholder="All Types" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Types</SelectItem>
+            <SelectItem value="all">All Types</SelectItem>
             <SelectItem value="car">Cars</SelectItem>
             <SelectItem value="bike">Bikes</SelectItem>
           </SelectContent>
@@ -83,7 +83,7 @@ const FiltersPanel = () => {
             <SelectValue placeholder="All Fuels" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Fuels</SelectItem>
+            <SelectItem value="all">All Fuels</SelectItem>
             <SelectItem value="petrol">Petrol</SelectItem>
             <SelectItem value="diesel">Diesel</SelectItem>
             <SelectItem value="electric">Electric</SelectItem>
@@ -100,7 +100,7 @@ const FiltersPanel = () => {
             <SelectValue placeholder="All Types" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Types</SelectItem>
+            <SelectItem value="all">All Types</SelectItem>
             <SelectItem value="manual">Manual</SelectItem>
             <SelectItem value="automatic">Automatic</SelectItem>
           </SelectContent>

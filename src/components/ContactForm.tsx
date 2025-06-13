@@ -17,7 +17,7 @@ const ContactForm = () => {
     email: '',
     phone: '',
     message: '',
-    subject: ''
+    subject: 'general'
   });
 
   const handleInputChange = (field: keyof ContactFormType, value: string) => {
