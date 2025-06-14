@@ -55,7 +55,9 @@ export interface Product {
   slug: string;
   description?: string;
   price: number;
+  price_inr?: number;
   image_url?: string;
+  images?: string[];
   category?: string;
   type?: string;
   brand?: string;
@@ -67,9 +69,46 @@ export interface Product {
   mileage?: number;
   featured?: boolean;
   available: boolean;
+  in_stock?: boolean;
   stock: number;
+  delivery_days?: number;
+  specs?: any;
   created_at?: string;
   updated_at?: string;
+}
+
+// Cart types
+export interface CartItem {
+  id: string;
+  user_id: string;
+  product_id: number;
+  quantity: number;
+  created_at: string;
+  updated_at: string;
+  product?: Product;
+}
+
+// Wishlist types
+export interface WishlistItem {
+  id: string;
+  user_id: string;
+  product_id: number;
+  created_at: string;
+  product?: Product;
+}
+
+// User Profile types
+export interface UserProfile {
+  id: string;
+  full_name?: string;
+  phone?: string;
+  address_line1?: string;
+  address_line2?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 // Order types
@@ -81,8 +120,15 @@ export interface Order {
   email: string;
   phone: string;
   delivery_address: string;
+  delivery_address_line2?: string;
   pincode: string;
+  city?: string;
+  state?: string;
   total_amount: number;
+  quantity?: number;
+  item_type?: 'car' | 'bike' | 'accessory';
+  payment_id?: string;
+  order_notes?: string;
   status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
   payment_status: 'pending' | 'completed' | 'failed';
   created_at: string;

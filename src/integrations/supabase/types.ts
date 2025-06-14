@@ -62,6 +62,41 @@ export type Database = {
           },
         ]
       }
+      cart: {
+        Row: {
+          created_at: string | null
+          id: string
+          product_id: number | null
+          quantity: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          product_id?: number | null
+          quantity?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          product_id?: number | null
+          quantity?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cart_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           description: string | null
@@ -198,10 +233,15 @@ export type Database = {
           address: string
           city: string
           created_at: string | null
+          delivery_address_line2: string | null
           email: string
           first_name: string
           id: number
+          item_type: string | null
           last_name: string
+          order_notes: string | null
+          payment_id: string | null
+          quantity: number | null
           state: string
           status: string
           total_price: number
@@ -213,10 +253,15 @@ export type Database = {
           address: string
           city: string
           created_at?: string | null
+          delivery_address_line2?: string | null
           email: string
           first_name: string
           id?: number
+          item_type?: string | null
           last_name: string
+          order_notes?: string | null
+          payment_id?: string | null
+          quantity?: number | null
           state: string
           status?: string
           total_price: number
@@ -228,10 +273,15 @@ export type Database = {
           address?: string
           city?: string
           created_at?: string | null
+          delivery_address_line2?: string | null
           email?: string
           first_name?: string
           id?: number
+          item_type?: string | null
           last_name?: string
+          order_notes?: string | null
+          payment_id?: string | null
+          quantity?: number | null
           state?: string
           status?: string
           total_price?: number
@@ -248,17 +298,22 @@ export type Database = {
           category: string | null
           category_id: number | null
           created_at: string | null
+          delivery_days: number | null
           description: string | null
           featured: boolean | null
           fuel: string | null
           id: number
           image_url: string | null
+          images: string[] | null
+          in_stock: boolean | null
           location: string | null
           mileage: number | null
           model: string | null
           name: string
           price: number
+          price_inr: number | null
           slug: string
+          specs: Json | null
           stock: number
           transmission: string | null
           type: string | null
@@ -271,17 +326,22 @@ export type Database = {
           category?: string | null
           category_id?: number | null
           created_at?: string | null
+          delivery_days?: number | null
           description?: string | null
           featured?: boolean | null
           fuel?: string | null
           id?: number
           image_url?: string | null
+          images?: string[] | null
+          in_stock?: boolean | null
           location?: string | null
           mileage?: number | null
           model?: string | null
           name: string
           price: number
+          price_inr?: number | null
           slug: string
+          specs?: Json | null
           stock?: number
           transmission?: string | null
           type?: string | null
@@ -294,17 +354,22 @@ export type Database = {
           category?: string | null
           category_id?: number | null
           created_at?: string | null
+          delivery_days?: number | null
           description?: string | null
           featured?: boolean | null
           fuel?: string | null
           id?: number
           image_url?: string | null
+          images?: string[] | null
+          in_stock?: boolean | null
           location?: string | null
           mileage?: number | null
           model?: string | null
           name?: string
           price?: number
+          price_inr?: number | null
           slug?: string
+          specs?: Json | null
           stock?: number
           transmission?: string | null
           type?: string | null
@@ -413,6 +478,74 @@ export type Database = {
             columns: ["location_id"]
             isOneToOne: false
             referencedRelation: "locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_profiles: {
+        Row: {
+          address_line1: string | null
+          address_line2: string | null
+          city: string | null
+          created_at: string | null
+          full_name: string | null
+          id: string
+          phone: string | null
+          pincode: string | null
+          state: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id: string
+          phone?: string | null
+          pincode?: string | null
+          state?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string
+          phone?: string | null
+          pincode?: string | null
+          state?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      wishlist: {
+        Row: {
+          created_at: string | null
+          id: string
+          product_id: number | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          product_id?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          product_id?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wishlist_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]

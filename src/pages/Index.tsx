@@ -1,173 +1,212 @@
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Car, Bike, Package, Star, ArrowRight } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import VehicleCard from '@/components/VehicleCard';
-import AccessoryCard from '@/components/AccessoryCard';
-import { Vehicle, Accessory } from '@/types';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { Badge } from '@/components/ui/badge';
+import { Heart, ShoppingCart, Star, ArrowRight, Truck, Shield, Clock, Users } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Index = () => {
-  const [featuredVehicles, setFeaturedVehicles] = useState<Vehicle[]>([]);
-  const [featuredAccessories, setFeaturedAccessories] = useState<Accessory[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
 
   useEffect(() => {
-    fetchFeaturedItems();
+    fetchFeaturedProducts();
   }, []);
 
-  const fetchFeaturedItems = async () => {
+  const fetchFeaturedProducts = async () => {
     try {
-      setLoading(true);
-      
-      // Fetch featured vehicles (cars and bikes)
-      const { data: vehicleData, error: vehicleError } = await supabase
+      const { data, error } = await supabase
         .from('products')
         .select('*')
-        .in('category', ['car', 'bike'])
         .eq('featured', true)
         .eq('available', true)
         .limit(6);
 
-      if (vehicleError) {
-        console.error('Error fetching vehicles:', vehicleError);
-        toast({
-          title: "Error",
-          description: "Failed to load vehicles",
-          variant: "destructive",
-        });
-      } else {
-        // Transform the data to match our Vehicle type
-        const transformedVehicles: Vehicle[] = vehicleData?.map(item => ({
-          id: item.id.toString(),
-          title: item.name,
-          type: item.category as 'car' | 'bike',
-          price: Number(item.price),
-          year: item.year || 2023,
-          fuel: item.fuel as 'Petrol' | 'Diesel' | 'Electric' | 'CNG' || 'Petrol',
-          transmission: item.transmission as 'Manual' | 'Automatic' || 'Manual',
-          image: item.image_url || 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=500',
-          location: item.location || 'India',
-          mileage: item.mileage,
-          brand: item.brand,
-          model: item.model,
-          featured: item.featured,
-          description: item.description
-        })) || [];
-        
-        setFeaturedVehicles(transformedVehicles);
-      }
-
-      // Fetch featured accessories
-      const { data: accessoryData, error: accessoryError } = await supabase
-        .from('products')
-        .select('*')
-        .eq('category', 'accessory')
-        .eq('featured', true)
-        .eq('available', true)
-        .limit(3);
-
-      if (accessoryError) {
-        console.error('Error fetching accessories:', accessoryError);
-        toast({
-          title: "Error",
-          description: "Failed to load accessories",
-          variant: "destructive",
-        });
-      } else {
-        // Transform the data to match our Accessory type
-        const transformedAccessories: Accessory[] = accessoryData?.map(item => ({
-          id: item.id.toString(),
-          title: item.name,
-          price: Number(item.price),
-          category: item.type as 'Interior' | 'Exterior' | 'Electronics' | 'Maintenance' | 'Safety' || 'Interior',
-          image: item.image_url || 'https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=500',
-          rating: 4.5, // Default rating since we don't have ratings in DB yet
-          description: item.description,
-          brand: item.brand,
-          inStock: item.available && item.stock > 0
-        })) || [];
-        
-        setFeaturedAccessories(transformedAccessories);
-      }
+      if (error) throw error;
+      setFeaturedProducts(data || []);
     } catch (error) {
-      console.error('Error fetching data:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load featured items",
-        variant: "destructive",
-      });
+      console.error('Error fetching products:', error);
+      toast.error('Failed to load featured products');
     } finally {
       setLoading(false);
     }
   };
 
-  const heroFeatures = [
-    {
-      icon: Car,
-      title: 'Premium Cars',
-      description: 'Find your dream car from verified dealers'
-    },
-    {
-      icon: Bike,
-      title: 'Best Bikes',
-      description: 'Explore motorcycles and scooters'
-    },
-    {
-      icon: Package,
-      title: 'Accessories',
-      description: 'Complete range of auto accessories'
-    }
-  ];
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0,
+    }).format(price);
+  };
+
+  const getProductsByCategory = (category: string) => {
+    return featuredProducts.filter(product => product.category === category);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <Navbar />
-      
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
       {/* Hero Section */}
-      <section className="relative pt-20 pb-32 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10" />
-        <div className="container mx-auto px-4 relative">
-          <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 text-balance">
-              Find Your Perfect
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"> Vehicle</span>
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Discover thousands of cars, bikes, and accessories from trusted dealers across India
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                <Link to="/vehicles" className="flex items-center gap-2">
-                  Browse Vehicles <ArrowRight className="w-4 h-4" />
-                </Link>
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img
+            src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1920&h=1080&fit=crop"
+            alt="Luxury vehicles"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/50"></div>
+        </div>
+
+        {/* Hero Content */}
+        <div className="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+            Your Dream Vehicle 🚗🇮🇳
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 text-gray-200">
+            Premium cars, bikes & accessories delivered to your doorstep
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link to="/vehicles">
+              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg px-8 py-4">
+                Explore Vehicles <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button size="lg" variant="outline">
-                <Link to="/accessories">Shop Accessories</Link>
+            </Link>
+            <Link to="/accessories">
+              <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-black text-lg px-8 py-4">
+                Shop Accessories 🛵
               </Button>
+            </Link>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-8 mt-16 max-w-2xl mx-auto">
+            <div className="text-center">
+              <div className="text-3xl font-bold">500+</div>
+              <div className="text-gray-300">Vehicles</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold">10K+</div>
+              <div className="text-gray-300">Happy Customers</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold">24/7</div>
+              <div className="text-gray-300">Support</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section className="py-20 -mt-16 relative z-10">
-        <div className="container mx-auto px-4">
+      {/* Why Choose Us */}
+      <section className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-16 text-gray-800">
+            Why Choose AutoMart? 🏆
+          </h2>
+          
+          <div className="grid md:grid-cols-4 gap-8">
+            <Card className="text-center p-6 hover:shadow-xl transition-shadow">
+              <CardContent className="p-0">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Truck className="w-8 h-8 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Fast Delivery</h3>
+                <p className="text-gray-600">Quick doorstep delivery across India</p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center p-6 hover:shadow-xl transition-shadow">
+              <CardContent className="p-0">
+                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Shield className="w-8 h-8 text-green-600" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Verified Quality</h3>
+                <p className="text-gray-600">All vehicles verified and certified</p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center p-6 hover:shadow-xl transition-shadow">
+              <CardContent className="p-0">
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Clock className="w-8 h-8 text-purple-600" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">24/7 Support</h3>
+                <p className="text-gray-600">Round the clock customer support</p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center p-6 hover:shadow-xl transition-shadow">
+              <CardContent className="p-0">
+                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-8 h-8 text-orange-600" />
+                </div>
+                <h3 className="text-xl font-semibold mb-2">Trusted by Thousands</h3>
+                <p className="text-gray-600">Join our satisfied customer family</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Cars */}
+      <section className="py-20 px-4 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex justify-between items-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-800">Featured Cars 🚗</h2>
+            <Link to="/vehicles">
+              <Button variant="outline">View All</Button>
+            </Link>
+          </div>
+          
           <div className="grid md:grid-cols-3 gap-8">
-            {heroFeatures.map((feature, index) => (
-              <Card key={index} className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
-                <CardContent className="p-8 text-center">
-                  <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                    <feature.icon className="w-8 h-8 text-white" />
+            {getProductsByCategory('car').map((product) => (
+              <Card key={product.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300">
+                <div className="relative">
+                  <img
+                    src={product.image_url || 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=500'}
+                    alt={product.name}
+                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute top-4 right-4">
+                    <Button size="sm" variant="ghost" className="bg-white/90 hover:bg-white">
+                      <Heart className="w-4 h-4" />
+                    </Button>
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-4">{feature.title}</h3>
-                  <p className="text-gray-600">{feature.description}</p>
+                  {product.featured && (
+                    <Badge className="absolute top-4 left-4 bg-gradient-to-r from-blue-600 to-purple-600">
+                      Featured
+                    </Badge>
+                  )}
+                </div>
+                
+                <CardContent className="p-6">
+                  <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Badge variant="outline">{product.year}</Badge>
+                    <Badge variant="outline">{product.fuel}</Badge>
+                  </div>
+                  <div className="text-2xl font-bold text-green-600 mb-4">
+                    {formatPrice(product.price)}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600">
+                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      Buy Now
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -175,105 +214,134 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Featured Vehicles */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Featured Vehicles</h2>
-            <p className="text-xl text-gray-600">Hand-picked premium vehicles just for you</p>
+      {/* Featured Bikes */}
+      <section className="py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex justify-between items-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-800">Featured Bikes 🏍️</h2>
+            <Link to="/vehicles">
+              <Button variant="outline">View All</Button>
+            </Link>
           </div>
           
-          {loading ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-              {[...Array(6)].map((_, index) => (
-                <Card key={index} className="animate-pulse">
-                  <div className="h-48 bg-gray-200 rounded-t-lg" />
-                  <CardContent className="p-6">
-                    <div className="h-4 bg-gray-200 rounded mb-4" />
-                    <div className="h-3 bg-gray-200 rounded mb-2" />
-                    <div className="h-3 bg-gray-200 rounded w-2/3" />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-              {featuredVehicles.map((vehicle) => (
-                <VehicleCard key={vehicle.id} vehicle={vehicle} />
-              ))}
-            </div>
-          )}
-          
-          <div className="text-center">
-            <Button size="lg" variant="outline">
-              <Link to="/vehicles">View All Vehicles</Link>
-            </Button>
+          <div className="grid md:grid-cols-3 gap-8">
+            {getProductsByCategory('bike').map((product) => (
+              <Card key={product.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300">
+                <div className="relative">
+                  <img
+                    src={product.image_url || 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=500'}
+                    alt={product.name}
+                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute top-4 right-4">
+                    <Button size="sm" variant="ghost" className="bg-white/90 hover:bg-white">
+                      <Heart className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  {product.featured && (
+                    <Badge className="absolute top-4 left-4 bg-gradient-to-r from-blue-600 to-purple-600">
+                      Featured
+                    </Badge>
+                  )}
+                </div>
+                
+                <CardContent className="p-6">
+                  <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Badge variant="outline">{product.brand}</Badge>
+                    <Badge variant="outline">{product.fuel}</Badge>
+                  </div>
+                  <div className="text-2xl font-bold text-green-600 mb-4">
+                    {formatPrice(product.price)}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600">
+                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      Buy Now
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Featured Accessories */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Featured Accessories</h2>
-            <p className="text-xl text-gray-600">Premium accessories for your vehicle</p>
-          </div>
+      {/* Testimonials */}
+      <section className="py-20 px-4 bg-gray-50">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-16 text-gray-800">What Our Customers Say 💬</h2>
           
-          {loading ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-              {[...Array(3)].map((_, index) => (
-                <Card key={index} className="animate-pulse">
-                  <div className="h-48 bg-gray-200 rounded-t-lg" />
-                  <CardContent className="p-6">
-                    <div className="h-4 bg-gray-200 rounded mb-4" />
-                    <div className="h-3 bg-gray-200 rounded mb-2" />
-                    <div className="h-3 bg-gray-200 rounded w-2/3" />
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-              {featuredAccessories.map((accessory) => (
-                <AccessoryCard key={accessory.id} accessory={accessory} />
-              ))}
-            </div>
-          )}
-          
-          <div className="text-center">
-            <Button size="lg" variant="outline">
-              <Link to="/accessories">Shop All Accessories</Link>
-            </Button>
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="p-6">
+              <CardContent className="p-0">
+                <div className="flex items-center justify-center mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-gray-600 mb-4">
+                  "Amazing service! Got my dream bike delivered in just 10 days. Highly recommended!"
+                </p>
+                <div className="font-semibold">Rahul Sharma</div>
+                <div className="text-sm text-gray-500">Mumbai</div>
+              </CardContent>
+            </Card>
+
+            <Card className="p-6">
+              <CardContent className="p-0">
+                <div className="flex items-center justify-center mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-gray-600 mb-4">
+                  "Best car buying experience ever. No hassle, great prices, excellent support."
+                </p>
+                <div className="font-semibold">Priya Patel</div>
+                <div className="text-sm text-gray-500">Bangalore</div>
+              </CardContent>
+            </Card>
+
+            <Card className="p-6">
+              <CardContent className="p-0">
+                <div className="flex items-center justify-center mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                  ))}
+                </div>
+                <p className="text-gray-600 mb-4">
+                  "Top quality accessories at unbeatable prices. Will definitely shop again!"
+                </p>
+                <div className="font-semibold">Amit Kumar</div>
+                <div className="text-sm text-gray-500">Delhi</div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8 text-center text-white">
-            <div>
-              <div className="text-4xl font-bold mb-2">10,000+</div>
-              <div className="text-blue-100">Vehicles Listed</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">50,000+</div>
-              <div className="text-blue-100">Happy Customers</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">500+</div>
-              <div className="text-blue-100">Trusted Dealers</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">100+</div>
-              <div className="text-blue-100">Cities Covered</div>
-            </div>
+      {/* CTA Section */}
+      <section className="py-20 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl font-bold mb-6">Ready to Find Your Perfect Vehicle? 🚀</h2>
+          <p className="text-xl mb-8 text-blue-100">
+            Join thousands of satisfied customers who found their dream vehicles with us
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to="/vehicles">
+              <Button size="lg" variant="secondary" className="text-lg px-8 py-4">
+                Browse Vehicles
+              </Button>
+            </Link>
+            <Link to="/contact">
+              <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-blue-600 text-lg px-8 py-4">
+                Contact Us
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 };
