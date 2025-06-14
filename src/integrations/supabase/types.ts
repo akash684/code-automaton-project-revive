@@ -244,42 +244,72 @@ export type Database = {
       products: {
         Row: {
           available: boolean
+          brand: string | null
+          category: string | null
           category_id: number | null
           created_at: string | null
           description: string | null
+          featured: boolean | null
+          fuel: string | null
           id: number
           image_url: string | null
+          location: string | null
+          mileage: number | null
+          model: string | null
           name: string
           price: number
           slug: string
           stock: number
+          transmission: string | null
+          type: string | null
           updated_at: string | null
+          year: number | null
         }
         Insert: {
           available?: boolean
+          brand?: string | null
+          category?: string | null
           category_id?: number | null
           created_at?: string | null
           description?: string | null
+          featured?: boolean | null
+          fuel?: string | null
           id?: number
           image_url?: string | null
+          location?: string | null
+          mileage?: number | null
+          model?: string | null
           name: string
           price: number
           slug: string
           stock?: number
+          transmission?: string | null
+          type?: string | null
           updated_at?: string | null
+          year?: number | null
         }
         Update: {
           available?: boolean
+          brand?: string | null
+          category?: string | null
           category_id?: number | null
           created_at?: string | null
           description?: string | null
+          featured?: boolean | null
+          fuel?: string | null
           id?: number
           image_url?: string | null
+          location?: string | null
+          mileage?: number | null
+          model?: string | null
           name?: string
           price?: number
           slug?: string
           stock?: number
+          transmission?: string | null
+          type?: string | null
           updated_at?: string | null
+          year?: number | null
         }
         Relationships: [
           {

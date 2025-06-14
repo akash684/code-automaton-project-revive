@@ -47,3 +47,44 @@ export interface User {
   phone?: string;
   created_at: string;
 }
+
+// Database types for products
+export interface Product {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string;
+  price: number;
+  image_url?: string;
+  category?: string;
+  type?: string;
+  brand?: string;
+  model?: string;
+  year?: number;
+  fuel?: string;
+  transmission?: string;
+  location?: string;
+  mileage?: number;
+  featured?: boolean;
+  available: boolean;
+  stock: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+// Order types
+export interface Order {
+  id: string;
+  user_id?: string;
+  product_id: number;
+  full_name: string;
+  email: string;
+  phone: string;
+  delivery_address: string;
+  pincode: string;
+  total_amount: number;
+  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+  payment_status: 'pending' | 'completed' | 'failed';
+  created_at: string;
+  updated_at: string;
+}
