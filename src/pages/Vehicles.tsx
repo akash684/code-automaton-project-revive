@@ -3,13 +3,13 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Product } from '@/types';
 import ProductCard from '@/components/ProductCard';
-import FiltersPanel from '@/components/FiltersPanel';
+import FiltersPanel, { Filters } from '@/components/FiltersPanel';
 import { toast } from 'sonner';
 
 const Vehicles = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<Filters>({
     category: '',
     priceRange: [0, 2000000],
     brand: '',

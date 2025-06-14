@@ -1,18 +1,19 @@
 
-import { Heart, ShoppingCart, Eye, Truck } from 'lucide-react';
+import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Heart, ShoppingCart } from 'lucide-react';
 import { Product } from '@/types';
 import { useCart } from '@/hooks/useCart';
 import { useWishlist } from '@/hooks/useWishlist';
-import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 interface ProductCardProps {
   product: Product;
 }
 
-const ProductCard = ({ product }: ProductCardProps) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { addToCart } = useCart();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
@@ -25,7 +26,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   const handleAddToCart = async () => {
-    await addToCart(product.id);
+    const success = await addToCart(product.id);
+    if (success) {
+      toast.success('Added to cart!');
+    }
   };
 
   const handleWishlistToggle = async () => {
@@ -36,100 +40,51 @@ const ProductCard = ({ product }: ProductCardProps) => {
     }
   };
 
-  const getDeliveryText = () => {
-    const days = product.delivery_days || 7;
-    return `${days} days delivery`;
-  };
+  const isWishlisted = isInWishlist(product.id);
 
   return (
-    <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-      <div className="relative overflow-hidden">
+    <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300">
+      <div className="relative">
         <img
           src={product.image_url || 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=500'}
           alt={product.name}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        
-        <div className="absolute top-3 right-3 flex flex-col gap-2">
-          <Button
-            size="sm"
-            variant="ghost"
+        <div className="absolute top-4 right-4">
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            className={`bg-white/90 hover:bg-white ${isWishlisted ? 'text-red-500' : ''}`}
             onClick={handleWishlistToggle}
-            className={cn(
-              "bg-white/90 hover:bg-white",
-              isInWishlist(product.id) && "text-red-500"
-            )}
           >
-            <Heart className={cn("w-4 h-4", isInWishlist(product.id) && "fill-current")} />
-          </Button>
-          <Button size="sm" variant="ghost" className="bg-white/90 hover:bg-white">
-            <Eye className="w-4 h-4" />
+            <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
           </Button>
         </div>
-
-        <div className="absolute top-3 left-3 flex flex-col gap-2">
-          {product.featured && (
-            <Badge className="bg-gradient-to-r from-blue-600 to-purple-600">
-              Featured
-            </Badge>
-          )}
-          {!product.in_stock && (
-            <Badge variant="destructive">Out of Stock</Badge>
-          )}
-        </div>
+        {product.featured && (
+          <Badge className="absolute top-4 left-4 bg-gradient-to-r from-blue-600 to-purple-600">
+            Featured
+          </Badge>
+        )}
       </div>
       
       <CardContent className="p-6">
-        <div className="flex items-center gap-2 mb-2">
-          <Badge variant="outline" className="text-xs">
-            {product.category}
-          </Badge>
-          {product.brand && (
-            <Badge variant="outline" className="text-xs">
-              {product.brand}
-            </Badge>
-          )}
+        <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
+        <div className="flex items-center gap-2 mb-3">
+          {product.category && <Badge variant="outline">{product.category}</Badge>}
+          {product.brand && <Badge variant="outline">{product.brand}</Badge>}
+          {product.year && <Badge variant="outline">{product.year}</Badge>}
+          {product.fuel && <Badge variant="outline">{product.fuel}</Badge>}
         </div>
-        
-        <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
-          {product.name}
-        </h3>
-        
-        {product.description && (
-          <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
-        )}
-
-        <div className="flex items-center gap-2 mb-4 text-sm text-gray-500">
-          <Truck className="w-4 h-4" />
-          <span>{getDeliveryText()}</span>
+        <div className="text-2xl font-bold text-green-600 mb-4">
+          {formatPrice(product.price)}
         </div>
-        
-        <div className="flex items-center justify-between mb-4">
-          <div className="text-2xl font-bold text-green-600">
-            {formatPrice(product.price)}
-          </div>
-          {product.stock > 0 && (
-            <div className="text-sm text-gray-500">
-              {product.stock} in stock
-            </div>
-          )}
-        </div>
-        
         <div className="flex gap-2">
           <Button 
+            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600"
             onClick={handleAddToCart}
-            disabled={!product.in_stock || product.stock === 0}
-            className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
           >
             <ShoppingCart className="w-4 h-4 mr-2" />
             Add to Cart
-          </Button>
-          <Button 
-            variant="outline" 
-            className="px-6"
-            disabled={!product.in_stock || product.stock === 0}
-          >
-            Buy Now
           </Button>
         </div>
       </CardContent>

@@ -58,7 +58,7 @@ export const useCart = () => {
 
         if (error) throw error;
       } else {
-        // Add new item
+        // Insert new item
         const { error } = await supabase
           .from('cart')
           .insert({
@@ -71,7 +71,6 @@ export const useCart = () => {
       }
 
       await fetchCartItems();
-      toast.success('Item added to cart');
       return true;
     } catch (error) {
       console.error('Error adding to cart:', error);
@@ -80,57 +79,39 @@ export const useCart = () => {
     }
   };
 
-  const updateQuantity = async (cartId: string, quantity: number) => {
+  const updateQuantity = async (cartItemId: string, newQuantity: number) => {
     try {
-      if (quantity <= 0) {
-        await removeFromCart(cartId);
-        return;
-      }
+      if (newQuantity <= 0) return;
 
       const { error } = await supabase
         .from('cart')
-        .update({ quantity })
-        .eq('id', cartId);
+        .update({ quantity: newQuantity })
+        .eq('id', cartItemId);
 
       if (error) throw error;
       await fetchCartItems();
+      return true;
     } catch (error) {
       console.error('Error updating quantity:', error);
       toast.error('Failed to update quantity');
+      return false;
     }
   };
 
-  const removeFromCart = async (cartId: string) => {
+  const removeFromCart = async (cartItemId: string) => {
     try {
       const { error } = await supabase
         .from('cart')
         .delete()
-        .eq('id', cartId);
+        .eq('id', cartItemId);
 
       if (error) throw error;
       await fetchCartItems();
-      toast.success('Item removed from cart');
+      return true;
     } catch (error) {
       console.error('Error removing from cart:', error);
       toast.error('Failed to remove item');
-    }
-  };
-
-  const clearCart = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { error } = await supabase
-        .from('cart')
-        .delete()
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-      setCartItems([]);
-    } catch (error) {
-      console.error('Error clearing cart:', error);
-      toast.error('Failed to clear cart');
+      return false;
     }
   };
 
@@ -144,15 +125,35 @@ export const useCart = () => {
     return cartItems.reduce((count, item) => count + item.quantity, 0);
   };
 
+  const clearCart = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+
+      const { error } = await supabase
+        .from('cart')
+        .delete()
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      await fetchCartItems();
+      return true;
+    } catch (error) {
+      console.error('Error clearing cart:', error);
+      toast.error('Failed to clear cart');
+      return false;
+    }
+  };
+
   return {
     cartItems,
     loading,
     addToCart,
     updateQuantity,
     removeFromCart,
-    clearCart,
     getCartTotal,
     getCartCount,
+    clearCart,
     refetch: fetchCartItems
   };
 };
