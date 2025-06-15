@@ -12,7 +12,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState(null);
   const { getCartCount } = useCart();
-  const { wishlistItems, loading: wishlistLoading } = useWishlist();
+  const { wishlistItems, loading: wishlistLoading, refetch: refetchWishlist } = useWishlist();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,10 +25,19 @@ const Navbar = () => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setUser(session?.user ?? null);
+        // Whenever sign in/out, refetch wishlist to keep count accurate
+        refetchWishlist && refetchWishlist();
       }
     );
 
     return () => subscription.unsubscribe();
+  }, []);
+
+  // On mount, also refetch wishlist for robust counter
+  useEffect(() => {
+    if (refetchWishlist) refetchWishlist();
+    // Optionally, could set up polling for more robustness
+    // eslint-disable-next-line
   }, []);
 
   const handleSignOut = async () => {

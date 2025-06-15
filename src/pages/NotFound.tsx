@@ -246,6 +246,8 @@ export default function WishlistPage() {
 }
 
 // ---- Card Component for a Wishlist Item ----
+import { useWishlistProductDetails } from "@/hooks/useWishlistProductDetails";
+
 function WishlistCard({
   item,
   view,
@@ -257,14 +259,25 @@ function WishlistCard({
   removing: boolean;
   onRemove: () => void;
 }) {
-  // Enhanced price extraction: fallback for all types
+  // If this is a product-type wishlist item and product data is missing, fetch it
+  const useDirectProduct =
+    item.item_type === "product" && typeof item.product === "object" && item.product !== null;
+  const { product: fetchedProduct } = useWishlistProductDetails(
+    !useDirectProduct && item.item_type === "product" ? item.product_id : null
+  );
+
+  // Prefer order: embedded product data > fetched product data > raw item data
+  const productData = useDirectProduct
+    ? item.product
+    : (fetchedProduct ? fetchedProduct : null);
+
   let image =
-    item.product?.image_url ||
+    productData?.image_url ||
     item.image_url ||
     item.image ||
     "/placeholder.svg";
   let title =
-    item.product?.name ||
+    productData?.name ||
     item.title ||
     (item.brand && item.model
       ? `${item.brand} ${item.model}`
@@ -272,41 +285,45 @@ function WishlistCard({
     item.brand ||
     item.name ||
     "Item";
-  
-  // Compute, fallback to any "price" available
+
   let price =
-    typeof item.product?.price === "number"
-      ? item.product.price
+    typeof productData?.price === "number"
+      ? productData.price
       : typeof item.price === "number"
       ? item.price
-      : typeof item.product?.price_inr === "number"
-      ? item.product.price_inr
+      : typeof productData?.price_inr === "number"
+      ? productData.price_inr
       : typeof item.price_inr === "number"
       ? item.price_inr
       : undefined;
 
   let stock =
+    productData?.in_stock ??
+    productData?.available ??
     item.product?.in_stock ??
     item.product?.available ??
     item.available ??
     true;
+
   let category =
-    item.product?.category ||
+    productData?.category ||
     item.category ||
-    item.product?.type ||
+    productData?.type ||
     item.type ||
     (item.item_type === "vehicle"
       ? "Vehicle"
       : item.item_type === "accessory"
       ? "Accessory"
       : "Misc");
-  let rating = item.product?.rating || item.rating || undefined;
-  let brand = item.product?.brand || item.brand || undefined;
+  let rating = productData?.rating || item.rating || undefined;
+  let brand = productData?.brand || item.brand || undefined;
 
-  // Always valid URLs for details
+  let description =
+    productData?.description || item.description || undefined;
+
   let detailsLink =
     item.item_type === "product"
-      ? `/products/${item.product?.slug ?? item.product_id ?? item.id ?? ""}`
+      ? `/products/${productData?.slug ?? item.product_id ?? item.id ?? ""}`
       : item.item_type === "vehicle"
       ? `/vehicles/${item.item_uuid ?? item.id ?? ""}`
       : item.item_type === "accessory"
@@ -353,19 +370,13 @@ function WishlistCard({
   const tags = (
     <div className="flex flex-wrap gap-1 text-xs text-slate-400 mb-1">
       {category && (
-        <span className="bg-slate-700 rounded-full px-2 py-0.5">
-          {category}
-        </span>
+        <span className="bg-slate-700 rounded-full px-2 py-0.5">{category}</span>
       )}
       {brand && (
-        <span className="border border-slate-600 rounded-full px-2 py-0.5">
-          {brand}
-        </span>
+        <span className="border border-slate-600 rounded-full px-2 py-0.5">{brand}</span>
       )}
-      {item.product?.type && !item.product?.category && (
-        <span className="bg-slate-700 rounded-full px-2 py-0.5">
-          {item.product?.type}
-        </span>
+      {productData?.type && !productData?.category && (
+        <span className="bg-slate-700 rounded-full px-2 py-0.5">{productData?.type}</span>
       )}
     </div>
   );
@@ -409,14 +420,36 @@ function WishlistCard({
       initial="initial"
       animate="animate"
       exit="exit"
-      variants={cardVariants}
+      variants={{
+        initial: { opacity: 0, y: 30, scale: 0.97 },
+        animate: { opacity: 1, y: 0, scale: 1 },
+        exit: { opacity: 0, y: 60, scale: 0.95, transition: { duration: 0.35 } }
+      }}
       layout
-      className={cardStyles}
+      className={
+        view === "grid"
+          ? "rounded-2xl shadow-xl bg-slate-800/90 border border-slate-700 hover:shadow-2xl ring-1 ring-transparent hover:ring-fuchsia-600 transition-all duration-150 flex flex-col min-h-[420px] relative"
+          : "rounded-xl shadow-lg bg-slate-800/95 border border-slate-700 flex flex-row items-center gap-4 p-3 min-h-[110px] hover:ring-2 hover:ring-fuchsia-500 relative"
+      }
       style={removing ? { pointerEvents: "none", opacity: 0.6 } : {}}
     >
       {view === "grid" ? (
         <>
-          {imageBox}
+          {/* Image Box */}
+          <div className={
+            "bg-slate-900 border border-slate-700 rounded-lg overflow-hidden flex items-center justify-center transition-transform duration-300 relative h-44 w-full mb-3"
+          }>
+            <img
+              src={image}
+              alt={title}
+              className="object-cover transition-transform duration-300 hover:scale-110 w-full h-full"
+              loading="lazy"
+            />
+            {/* Stock Badge */}
+            <span className={cn(badgeClasses(stock), "absolute top-2 left-2 z-10")}>
+              {stock ? "In Stock" : "Out of Stock"}
+            </span>
+          </div>
           <div className="flex-1 flex flex-col gap-1 px-2 pb-2">
             <Link
               to={detailsLink}
@@ -431,12 +464,28 @@ function WishlistCard({
               </span>
               {getRatingStars(rating)}
             </div>
+            {/* NEW: Description */}
+            {description && (
+              <div className="text-xs text-slate-400 mt-1 line-clamp-2">{description}</div>
+            )}
             {actions}
           </div>
         </>
       ) : (
         <>
-          {imageBox}
+          {/* Image Box */}
+          <div className="bg-slate-900 border border-slate-700 rounded-lg overflow-hidden flex items-center justify-center transition-transform duration-300 relative h-24 w-24 mr-5">
+            <img
+              src={image}
+              alt={title}
+              className="object-cover transition-transform duration-300 hover:scale-110 h-full w-full"
+              loading="lazy"
+            />
+            {/* Stock Badge */}
+            <span className={cn(badgeClasses(stock), "absolute top-2 left-2 z-10")}>
+              {stock ? "In Stock" : "Out of Stock"}
+            </span>
+          </div>
           <div className="flex flex-1 flex-col gap-1">
             <Link to={detailsLink} className="hover:text-cyan-400 text-base font-bold text-white">
               {title}
@@ -448,6 +497,10 @@ function WishlistCard({
               </span>
               {getRatingStars(rating)}
             </div>
+            {/* NEW: Description */}
+            {description && (
+              <div className="text-xs text-slate-400 mt-1 line-clamp-2">{description}</div>
+            )}
             <div className="flex gap-2 mt-2">{actions}</div>
           </div>
         </>
