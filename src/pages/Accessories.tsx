@@ -73,7 +73,7 @@ export default function Accessories() {
                   <SelectContent>
                     <SelectItem
                       value="all"
-                      className="bg-muted text-foreground hover:bg-muted/70 data-[state=checked]:bg-accent data-[state=checked]:text-background font-semibold"
+                      className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-[#0D1B3C] data-[state=checked]:text-white font-semibold"
                     >
                       All Types
                     </SelectItem>
@@ -81,7 +81,7 @@ export default function Accessories() {
                       <SelectItem
                         key={cat}
                         value={cat}
-                        className="bg-muted text-foreground hover:bg-muted/70 data-[state=checked]:bg-accent data-[state=checked]:text-background"
+                        className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-[#0D1B3C] data-[state=checked]:text-white"
                       >
                         {cat}
                       </SelectItem>
@@ -104,19 +104,19 @@ export default function Accessories() {
                   <SelectContent>
                     <SelectItem
                       value="all"
-                      className="bg-muted text-foreground hover:bg-muted/70 data-[state=checked]:bg-accent data-[state=checked]:text-background"
+                      className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-[#0D1B3C] data-[state=checked]:text-white"
                     >
                       All Vehicles
                     </SelectItem>
                     <SelectItem
                       value="car"
-                      className="bg-muted text-foreground hover:bg-muted/70 data-[state=checked]:bg-accent data-[state=checked]:text-background"
+                      className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-[#0D1B3C] data-[state=checked]:text-white"
                     >
                       Car
                     </SelectItem>
                     <SelectItem
                       value="bike"
-                      className="bg-muted text-foreground hover:bg-muted/70 data-[state=checked]:bg-accent data-[state=checked]:text-background"
+                      className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-[#0D1B3C] data-[state=checked]:text-white"
                     >
                       Bike
                     </SelectItem>
@@ -136,19 +136,19 @@ export default function Accessories() {
                   <SelectContent>
                     <SelectItem
                       value="all"
-                      className="bg-muted text-foreground hover:bg-muted/70 data-[state=checked]:bg-accent data-[state=checked]:text-background"
+                      className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-[#0D1B3C] data-[state=checked]:text-white"
                     >
                       All
                     </SelectItem>
                     <SelectItem
                       value="true"
-                      className="bg-muted text-foreground hover:bg-muted/70 data-[state=checked]:bg-accent data-[state=checked]:text-background"
+                      className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-[#0D1B3C] data-[state=checked]:text-white"
                     >
                       In Stock
                     </SelectItem>
                     <SelectItem
                       value="false"
-                      className="bg-muted text-foreground hover:bg-muted/70 data-[state=checked]:bg-accent data-[state=checked]:text-background"
+                      className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-[#0D1B3C] data-[state=checked]:text-white"
                     >
                       Out of Stock
                     </SelectItem>
