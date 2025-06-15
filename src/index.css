@@ -7,6 +7,7 @@
   :root {
     --background: 0 0% 100%;
     --card: 0 0% 100%;
+    --input: 0 0% 97%; /* <--- ADDED for form inputs, a light gray */
     --foreground: 222.2 47.4% 11.2%;
     --muted: 220 14% 65%;
     --accent: 24 94% 50%;
@@ -19,6 +20,7 @@
   .dark {
     --background: 222.2 84% 4.9%;
     --card: 222.2 64% 7.5%;
+    --input: 222.2 56% 14%; /* <--- ADDED for dark mode, a dark gray-blue */
     --foreground: 210 40% 98%;
     --muted: 215 15% 70%;
     --accent: 24 94% 62%;

@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -22,6 +23,7 @@ export default {
         foreground: 'hsl(var(--foreground))',
         muted:      'hsl(var(--muted))',
         accent:     'hsl(var(--accent))',
+        input:      'hsl(var(--input))',  // <--- ADDED FOR INPUTS
         // Status
         success:  { DEFAULT: "hsl(var(--color-success))" },
         warning:  { DEFAULT: "hsl(var(--color-warning))" },
@@ -69,3 +71,4 @@ export default {
     require("tailwindcss-animate"),
   ],
 } satisfies Config;
+
