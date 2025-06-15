@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,15 +27,15 @@ export function FilterPanel({
   transmissionTypes,
   withCategory
 }: FilterPanelProps) {
-  // Ensure no empty string options in selects
-  const filteredBrands = (brands || []).filter(Boolean);
-  const filteredCategories = (categories || []).filter(Boolean);
-  const filteredFuelTypes = (fuelTypes || []).filter(Boolean);
-  const filteredTransmissionTypes = (transmissionTypes || []).filter(Boolean);
+  // Ensure *no* empty string options in selects and all items are strings
+  const filteredBrands = (brands || []).filter(b => typeof b === "string" && b.trim().length > 0);
+  const filteredCategories = (categories || []).filter(c => typeof c === "string" && c.trim().length > 0);
+  const filteredFuelTypes = (fuelTypes || []).filter(f => typeof f === "string" && f.trim().length > 0);
+  const filteredTransmissionTypes = (transmissionTypes || []).filter(t => typeof t === "string" && t.trim().length > 0);
 
   return (
     <div className="space-y-6 p-4">
-      {withCategory && filteredCategories && (
+      {withCategory && filteredCategories.length > 0 && (
         <div>
           <div className="font-medium mb-1">Category</div>
           <Select value={filters.category ?? ""} onValueChange={v => onChange({ ...filters, category: v })}>
@@ -45,12 +44,14 @@ export function FilterPanel({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All</SelectItem>
-              {filteredCategories.map(c => (<SelectItem value={c} key={c}>{c}</SelectItem>))}
+              {filteredCategories.map(c => (
+                <SelectItem value={c} key={c}>{c}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
       )}
-      {filteredBrands && (
+      {filteredBrands.length > 0 && (
         <div>
           <div className="font-medium mb-1">Brand</div>
           <Select value={filters.brand ?? ""} onValueChange={v => onChange({ ...filters, brand: v })}>
@@ -59,7 +60,9 @@ export function FilterPanel({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All</SelectItem>
-              {filteredBrands.map(b => (<SelectItem value={b} key={b}>{b}</SelectItem>))}
+              {filteredBrands.map(b => (
+                <SelectItem value={b} key={b}>{b}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -73,7 +76,9 @@ export function FilterPanel({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All</SelectItem>
-              {filteredFuelTypes.map(f => (<SelectItem value={f} key={f}>{f}</SelectItem>))}
+              {filteredFuelTypes.map(f => (
+                <SelectItem value={f} key={f}>{f}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -87,7 +92,9 @@ export function FilterPanel({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All</SelectItem>
-              {filteredTransmissionTypes.map(tr => (<SelectItem value={tr} key={tr}>{tr}</SelectItem>))}
+              {filteredTransmissionTypes.map(tr => (
+                <SelectItem value={tr} key={tr}>{tr}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
