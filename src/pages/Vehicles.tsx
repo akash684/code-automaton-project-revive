@@ -50,16 +50,26 @@ export default function Vehicles() {
       search,
       sort
     ],
-    queryFn: () =>
-      fetchVehicles({
-        category: filters.category === "all" ? undefined : (filters.category as "car" | "bike" | ""),
-        brand: filters.brand === "all" ? undefined : filters.brand,
-        fuel: filters.fuel === "all" ? undefined : filters.fuel,
-        transmission: filters.transmission === "all" ? undefined : filters.transmission,
-        priceRange: filters.priceRange,
-        search,
-        sort: sort as "price-asc" | "price-desc",
-      })
+    queryFn: async () => {
+      // NEW: Fetch from 'products' table just bikes
+      const { data, error } = await import("@/integrations/supabase/client").then(({ supabase }) =>
+        supabase
+          .from('products')
+          .select('*')
+          .eq('category', filters.category === "all" ? undefined : filters.category === "bike" ? "bike" : filters.category)
+          .ilike('model', `%${search}%`)
+          .order(sort === "price-asc" ? "price" : "price", { ascending: sort === "price-asc" })
+      );
+      if (error) {
+        console.error("Failed to fetch bikes:", error.message);
+        return [];
+      }
+      // Only return bikes if "bike", else fallback to all
+      if (filters.category === "bike") {
+        return data ?? [];
+      }
+      return data ?? [];
+    }
   });
 
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
