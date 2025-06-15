@@ -1,4 +1,3 @@
-
 // Vehicles Page - fetches from "vehicles" table
 
 import { useQuery } from "@tanstack/react-query";
@@ -254,24 +253,6 @@ export default function Vehicles() {
                       <Badge className="absolute top-3 right-3 bg-blue-700 text-white capitalize">
                         {vehicle.category}
                       </Badge>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className={`absolute bottom-3 right-3 border ${
-                          isInWishlist(vehicle.id)
-                            ? "bg-pink-700 border-pink-400 text-white"
-                            : "bg-gray-900 border-gray-700 text-gray-300"
-                        }`}
-                        onClick={() =>
-                          isInWishlist(vehicle.id)
-                            ? removeFromWishlist(vehicle.id)
-                            : addToWishlist(vehicle.id)
-                        }
-                        aria-label={isInWishlist(vehicle.id) ? "Remove from favourites" : "Add to favourites"}
-                        title={isInWishlist(vehicle.id) ? "Remove from favourites" : "Add to favourites"}
-                      >
-                        <Heart fill={isInWishlist(vehicle.id) ? "#ec4899" : "none"} className="w-5 h-5" />
-                      </Button>
                     </motion.div>
                     <CardContent className="p-5">
                       <div className="mb-1 font-heading text-lg font-semibold">{vehicle.model}</div>

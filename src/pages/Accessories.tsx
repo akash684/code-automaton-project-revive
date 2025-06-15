@@ -211,24 +211,6 @@ export default function Accessories() {
                       <Badge className="absolute top-3 right-3 bg-blue-700 text-white">
                         {accessory.category}
                       </Badge>
-                      <Button
-                        size="icon"
-                        variant="ghost"
-                        className={`absolute bottom-3 right-3 border ${
-                          isInWishlist(accessory.id)
-                            ? "bg-pink-700 border-pink-400 text-white"
-                            : "bg-gray-900 border-gray-700 text-gray-300"
-                        }`}
-                        onClick={() =>
-                          isInWishlist(accessory.id)
-                            ? removeFromWishlist(accessory.id)
-                            : addToWishlist(accessory.id)
-                        }
-                        aria-label={isInWishlist(accessory.id) ? "Remove from favourites" : "Add to favourites"}
-                        title={isInWishlist(accessory.id) ? "Remove from favourites" : "Add to favourites"}
-                      >
-                        <Heart fill={isInWishlist(accessory.id) ? "#ec4899" : "none"} className="w-5 h-5" />
-                      </Button>
                     </motion.div>
                     <CardContent className="p-5">
                       <div className="mb-1 font-heading text-lg font-semibold">{accessory.name}</div>
