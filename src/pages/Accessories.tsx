@@ -172,7 +172,7 @@ export default function Accessories() {
               />
               {/* Sort */}
               <Select value={sort} onValueChange={setSort}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-white dark:bg-[#11192f]">
                   <SelectValue placeholder="Sort" />
                 </SelectTrigger>
                 <SelectContent>

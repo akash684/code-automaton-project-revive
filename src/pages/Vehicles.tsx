@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -253,7 +252,7 @@ export default function Vehicles() {
               />
               {/* Sort */}
               <Select value={sort} onValueChange={setSort}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-white dark:bg-[#11192f]">
                   <SelectValue placeholder="Sort" />
                 </SelectTrigger>
                 <SelectContent>
