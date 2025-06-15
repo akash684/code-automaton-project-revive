@@ -9,22 +9,17 @@ import { Vehicle as VehicleBase } from "@/types/supabase";
 interface VehicleCardProps {
   vehicle: VehicleBase & {
     compatible_vehicle_types?: string[];
-    stock?: number;
+    // stock removed for simplicity
   };
-  setSelectedItem?: (item: { name: string; price: number; image_url: string }) => void;
-  setBuyModalOpen?: (open: boolean) => void;
+  onBuy?: (vehicle: { name: string; price: number; image_url: string }) => void;
 }
 
 export function VehicleCard({
   vehicle,
-  setSelectedItem,
-  setBuyModalOpen,
+  onBuy,
 }: VehicleCardProps) {
   const compatible = vehicle.compatible_vehicle_types || [];
-  const isInStock =
-    vehicle.available && typeof vehicle.stock === "number" && vehicle.stock > 0;
-  const stockDisplay =
-    typeof vehicle.stock === "number" ? vehicle.stock : "--";
+  const isInStock = vehicle.available;
   const title = [vehicle.brand, vehicle.model].filter(Boolean).join(" ");
 
   return (
@@ -67,23 +62,19 @@ export function VehicleCard({
         <div className="text-2xl font-bold text-blue-400 mb-3">
           ₹{new Intl.NumberFormat("en-IN").format(vehicle.price)}
         </div>
-        <div className="text-sm text-gray-300 mb-2">Stock: {stockDisplay}</div>
         <div className="flex gap-2">
           <Button
             className="flex-1 bg-gradient-to-r from-blue-700 to-purple-700 text-white"
             disabled={!isInStock}
-            onClick={
-              setSelectedItem && setBuyModalOpen
-                ? () => {
-                    setSelectedItem({
-                      name: title,
-                      price: vehicle.price,
-                      image_url: vehicle.image_url,
-                    });
-                    setBuyModalOpen(true);
-                  }
-                : undefined
-            }
+            onClick={() => {
+              if (onBuy) {
+                onBuy({
+                  name: title,
+                  price: vehicle.price,
+                  image_url: vehicle.image_url,
+                });
+              }
+            }}
           >
             Buy Now
           </Button>

@@ -9,6 +9,7 @@ import { DEFAULT_PRICE_RANGE } from "@/constants/price";
 import type { Database } from "@/integrations/supabase/types";
 import { Vehicle } from "@/types/supabase";
 import { VehicleCard } from "@/components/ui/vehicle-card";
+import BuyModal from "@/components/BuyModal";
 
 // Correct VehicleRow based on your schema
 type VehicleRow = Database["public"]["Tables"]["vehicles"]["Row"];
@@ -24,6 +25,10 @@ export default function Vehicles() {
   const [priceRange, setPriceRange] = useState<[number, number]>(DEFAULT_PRICE_RANGE);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("price-asc");
+
+  // --- Buy Modal State ---
+  const [buyModalOpen, setBuyModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<{ name: string; price: number; image_url: string } | null>(null);
 
   // --- Fetch logic for vehicles from the "vehicles" table ---
   const vehiclesQuery = useQuery({
@@ -99,89 +104,87 @@ export default function Vehicles() {
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar */}
           <aside className="md:w-72 mb-4 shrink-0">
-            <div className="space-y-6 p-6 rounded-2xl bg-card text-foreground border border-border shadow backdrop-blur-lg">
-              {/* Vehicle Type */}
-              <div>
-                <div className="font-medium mb-1">Type</div>
-                <Select
-                  value={filters.category}
-                  onValueChange={v => setFilters(f => ({ ...f, category: v }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="All Types" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="car">Car</SelectItem>
-                    <SelectItem value="bike">Bike</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              {/* Brand */}
-              <div>
-                <div className="font-medium mb-1">Brand</div>
-                <Input
-                  value={filters.brand === "all" ? "" : filters.brand}
-                  placeholder="All Brands"
-                  onChange={e => setFilters(f => ({
-                    ...f,
-                    brand: e.target.value.trim() || "all",
-                  }))}
-                />
-              </div>
-              {/* Fuel */}
-              <div>
-                <div className="font-medium mb-1">Fuel</div>
-                <Input
-                  value={filters.fuel === "all" ? "" : filters.fuel}
-                  placeholder="All Fuels"
-                  onChange={e => setFilters(f => ({
-                    ...f,
-                    fuel: e.target.value.trim() || "all",
-                  }))}
-                />
-              </div>
-              {/* Transmission */}
-              <div>
-                <div className="font-medium mb-1">Transmission</div>
-                <Input
-                  value={filters.transmission === "all" ? "" : filters.transmission}
-                  placeholder="All Transmissions"
-                  onChange={e => setFilters(f => ({
-                    ...f,
-                    transmission: e.target.value.trim() || "all",
-                  }))}
-                />
-              </div>
-              {/* Price with Sliders */}
-              <div>
-                <div className="font-medium mb-1">Price</div>
-                <input
-                  type="range"
-                  min={DEFAULT_PRICE_RANGE[0]}
-                  max={DEFAULT_PRICE_RANGE[1]}
-                  value={priceRange[0]}
-                  onChange={e => setPriceRange(pr => [Number(e.target.value), pr[1]])}
-                  className="w-full"
-                />
-                <input
-                  type="range"
-                  min={DEFAULT_PRICE_RANGE[0]}
-                  max={DEFAULT_PRICE_RANGE[1]}
-                  value={priceRange[1]}
-                  onChange={e => setPriceRange(pr => [pr[0], Number(e.target.value)])}
-                  className="w-full"
-                />
-                <div className="flex justify-between text-xs mt-1">
-                  <span>₹{priceRange[0]}</span>
-                  <span>₹{priceRange[1]}</span>
-                </div>
-              </div>
-              {/* Reset Filters */}
-              <Button className="mt-3 w-full" variant="outline" onClick={handleReset}>
-                Reset Filters
-              </Button>
+            {/* Vehicle Type */}
+            <div>
+              <div className="font-medium mb-1">Type</div>
+              <Select
+                value={filters.category}
+                onValueChange={v => setFilters(f => ({ ...f, category: v }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="All Types" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="car">Car</SelectItem>
+                  <SelectItem value="bike">Bike</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
+            {/* Brand */}
+            <div>
+              <div className="font-medium mb-1">Brand</div>
+              <Input
+                value={filters.brand === "all" ? "" : filters.brand}
+                placeholder="All Brands"
+                onChange={e => setFilters(f => ({
+                  ...f,
+                  brand: e.target.value.trim() || "all",
+                }))}
+              />
+            </div>
+            {/* Fuel */}
+            <div>
+              <div className="font-medium mb-1">Fuel</div>
+              <Input
+                value={filters.fuel === "all" ? "" : filters.fuel}
+                placeholder="All Fuels"
+                onChange={e => setFilters(f => ({
+                  ...f,
+                  fuel: e.target.value.trim() || "all",
+                }))}
+              />
+            </div>
+            {/* Transmission */}
+            <div>
+              <div className="font-medium mb-1">Transmission</div>
+              <Input
+                value={filters.transmission === "all" ? "" : filters.transmission}
+                placeholder="All Transmissions"
+                onChange={e => setFilters(f => ({
+                  ...f,
+                  transmission: e.target.value.trim() || "all",
+                }))}
+              />
+            </div>
+            {/* Price with Sliders */}
+            <div>
+              <div className="font-medium mb-1">Price</div>
+              <input
+                type="range"
+                min={DEFAULT_PRICE_RANGE[0]}
+                max={DEFAULT_PRICE_RANGE[1]}
+                value={priceRange[0]}
+                onChange={e => setPriceRange(pr => [Number(e.target.value), pr[1]])}
+                className="w-full"
+              />
+              <input
+                type="range"
+                min={DEFAULT_PRICE_RANGE[0]}
+                max={DEFAULT_PRICE_RANGE[1]}
+                value={priceRange[1]}
+                onChange={e => setPriceRange(pr => [pr[0], Number(e.target.value)])}
+                className="w-full"
+              />
+              <div className="flex justify-between text-xs mt-1">
+                <span>₹{priceRange[0]}</span>
+                <span>₹{priceRange[1]}</span>
+              </div>
+            </div>
+            {/* Reset Filters */}
+            <Button className="mt-3 w-full" variant="outline" onClick={handleReset}>
+              Reset Filters
+            </Button>
           </aside>
           {/* Main content */}
           <section className="flex-1 min-w-0">
@@ -212,7 +215,14 @@ export default function Vehicles() {
               // vehicle grid/card list
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {vehiclesQuery.data.map(vehicle => (
-                  <VehicleCard key={vehicle.id} vehicle={vehicle} />
+                  <VehicleCard
+                    key={vehicle.id}
+                    vehicle={vehicle}
+                    onBuy={(item) => {
+                      setSelectedItem(item);
+                      setBuyModalOpen(true);
+                    }}
+                  />
                 ))}
               </div>
             ) : (
@@ -221,6 +231,15 @@ export default function Vehicles() {
           </section>
         </div>
       </main>
+      {/* Buy Modal */}
+      {selectedItem && (
+        <BuyModal
+          open={buyModalOpen}
+          onOpenChange={(open) => setBuyModalOpen(open)}
+          item={selectedItem}
+          itemType="Vehicle"
+        />
+      )}
     </div>
   );
 }

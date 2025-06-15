@@ -125,75 +125,6 @@ const Index = () => {
             </div>
           </div>
         </section>
-        {/* Featured Cars */}
-        <section className="py-14">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold drop-shadow">Featured Cars 🚗</h2>
-            <Link to="/vehicles">
-              <Button variant="outline" className="border-white/40 text-white hover:bg-white/10">View All</Button>
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {getProductsByCategory('car').map((product) => (
-              <Card key={product.id} className="group overflow-hidden bg-gradient-to-br from-[#252932] to-black/10 backdrop-blur-2xl border border-white/10 shadow-xl hover:scale-105 transition-transform">
-                <div className="relative">
-                  <img
-                    src={product.image_url || 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=500'}
-                    alt={product.name}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform"
-                    loading="lazy"
-                  />
-                  <div className="absolute top-4 right-4">
-                    <Button size="sm" variant="ghost" className="bg-black/40 hover:bg-black/60 border border-white/10 text-white">
-                      <Heart className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  {product.featured && (
-                    <Badge className="absolute top-4 left-4 bg-gradient-to-r from-blue-800 to-purple-800 text-white shadow">
-                      Featured
-                    </Badge>
-                  )}
-                </div>
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-2 text-white">{product.name}</h3>
-                  <div className="flex items-center gap-2 mb-3">
-                    <Badge variant="outline" className="bg-black/40 border-white/30 text-white">{product.year}</Badge>
-                    <Badge variant="outline" className="bg-black/40 border-white/30 text-white">{product.fuel}</Badge>
-                  </div>
-                  <div className="text-2xl font-bold text-green-400 mb-2">
-                    {formatPrice(Number(product.price))}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button className="flex-1 bg-gradient-to-r from-blue-700 to-purple-700 text-white border-0 shadow hover:scale-105 transition-transform">
-                      <ShoppingCart className="w-4 h-4 mr-2" />
-                      Buy Now
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-          {/* Description & Info Bar */}
-          <div className="rounded-xl mt-10 p-6 bg-gradient-to-r from-blue-900/60 to-purple-700/40 backdrop-blur-lg shadow-lg flex flex-col md:flex-row items-center md:justify-between gap-6">
-            <p className="text-lg font-medium max-w-xl">
-              Discover the most popular cars chosen by our customers. All vehicles are thoroughly inspected and available for rent or purchase with transparent pricing.
-            </p>
-            <div className="flex flex-row flex-wrap gap-6 items-center justify-end mt-4 md:mt-0">
-              <div className="flex flex-col items-center">
-                <span className="text-2xl font-bold text-blue-300">1500+</span>
-                <span className="text-xs text-slate-300">Cars Available</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="text-2xl font-bold text-green-300">750K</span>
-                <span className="text-xs text-slate-300">Happy Customers</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="text-2xl font-bold text-purple-300">200+</span>
-                <span className="text-xs text-slate-300">Verified Dealers</span>
-              </div>
-            </div>
-          </div>
-        </section>
         {/* Popular Vehicle Brands Section */}
         <section className="py-10">
           <h3 className="text-2xl font-bold mb-6 drop-shadow text-center">Popular Vehicle Brands</h3>
@@ -208,61 +139,6 @@ const Index = () => {
             ))}
           </div>
           <p className="text-center text-slate-400 max-w-2xl mx-auto">We partner with leading car and bike manufacturers to bring you the widest range of vehicles. Filter by your favorite brand to find your dream ride!</p>
-        </section>
-        {/* Featured Bikes */}
-        <section className="py-14">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold drop-shadow">Featured Bikes 🏍️</h2>
-            <Link to="/vehicles">
-              <Button variant="outline" className="border-white/40 text-white hover:bg-white/10">View All</Button>
-            </Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {getProductsByCategory('bike').map((product) => (
-              <Card key={product.id} className="group overflow-hidden bg-gradient-to-br from-[#252932] to-black/10 backdrop-blur-2xl border border-white/10 shadow-xl hover:scale-105 transition-transform">
-                <div className="relative">
-                  <img
-                    src={product.image_url || 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=500'}
-                    alt={product.name}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform"
-                    loading="lazy"
-                  />
-                  <div className="absolute top-4 right-4">
-                    <Button size="sm" variant="ghost" className="bg-black/40 hover:bg-black/60 border border-white/10 text-white">
-                      <Heart className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  {product.featured && (
-                    <Badge className="absolute top-4 left-4 bg-gradient-to-r from-blue-800 to-purple-800 text-white shadow">
-                      Featured
-                    </Badge>
-                  )}
-                </div>
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold mb-2 text-white">{product.name}</h3>
-                  <div className="flex items-center gap-2 mb-3">
-                    <Badge variant="outline" className="bg-black/40 border-white/30 text-white">{product.brand}</Badge>
-                    <Badge variant="outline" className="bg-black/40 border-white/30 text-white">{product.fuel}</Badge>
-                  </div>
-                  <div className="text-2xl font-bold text-green-400 mb-2">
-                    {formatPrice(Number(product.price))}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button className="flex-1 bg-gradient-to-r from-blue-700 to-purple-700 text-white border-0 shadow hover:scale-105 transition-transform">
-                      <ShoppingCart className="w-4 h-4 mr-2" />
-                      Buy Now
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-          {/* Description */}
-          <div className="rounded-xl mt-10 p-6 bg-gradient-to-r from-purple-900/60 to-blue-700/40 backdrop-blur-lg shadow-lg flex items-center">
-            <p className="text-lg font-medium text-center w-full">
-              From speed lovers to everyday commuters, our featured bikes collection has something for everyone. Explore, compare, and book your perfect ride today.
-            </p>
-          </div>
         </section>
         {/* Testimonials */}
         <section className="py-16">
