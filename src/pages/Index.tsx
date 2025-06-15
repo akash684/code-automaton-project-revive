@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Product } from '@/types';
@@ -7,14 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Heart, ShoppingCart, Star, ArrowRight, Truck, Shield, Clock, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { BrandDisplayText } from "@/components/BrandDisplayText";
-import { BrandButton } from "@/components/BrandButton";
-import { HomeHeroBg } from "@/components/HomeHeroBg";
 import { Navbar } from "@/components/ui/navbar";
 import { motion } from "framer-motion";
-
-const heroBg =
-  "/lovable-uploads/4605de8a-f1a2-408b-83a7-6687db4469f0.png"; // Reference image for now. Replace with production asset if needed.
 
 const Index = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -57,31 +52,31 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-950">
+      <div className="min-h-screen flex items-center justify-center bg-gray-950">
         <div className="animate-spin rounded-full h-24 w-24 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gradient-to-br from-gray-900 via-[#181b20] to-gray-950 min-h-screen text-white transition-colors duration-300">
-      <Navbar onToggleDark={() => document.documentElement.classList.toggle('dark')} />
+    <div className="bg-gray-950 min-h-screen text-white transition-colors duration-300">
+      <Navbar onToggleDark={() => {}} />
       <main className="container mx-auto px-4">
-        {/* Hero Section */}
+        {/* Hero Section (Image removed, only dark background + text/buttons) */}
         <motion.section
-          className="relative flex flex-col md:flex-row items-center min-h-[75vh] py-8 md:py-16"
+          className="relative flex flex-col items-center min-h-[60vh] py-12 md:py-20 bg-gradient-to-br from-gray-900 via-[#17181b] to-gray-950 rounded-3xl shadow"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
         >
-          <div className="md:w-1/2 w-full z-20 flex flex-col items-start justify-center">
-            <h1 className="text-5xl md:text-6xl font-bold mb-4 leading-tight drop-shadow" style={{ fontFamily: 'Poppins, Inter, sans-serif' }}>
+          <div className="z-20 flex flex-col items-center justify-center max-w-2xl mx-auto">
+            <h1 className="text-5xl md:text-6xl font-bold mb-4 leading-tight drop-shadow text-center" style={{ fontFamily: 'Poppins, Inter, sans-serif' }}>
               Drive Your Dream <span className="text-blue-400">—</span>
               <br />
               <span className="block font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">Rent or Own, the Smart Way</span>
             </h1>
-            <p className="text-lg md:text-xl text-slate-200 mb-8">India’s #1 platform for cars, bikes, and the rides you love—buy, rent, or accessorize in seconds.</p>
-            <div className="flex gap-4">
+            <p className="text-lg md:text-xl text-slate-200 mb-8 text-center">India’s #1 platform for cars, bikes, and the rides you love—buy, rent, or accessorize in seconds.</p>
+            <div className="flex gap-4 flex-col sm:flex-row items-center">
               <Link to="/vehicles">
                 <Button size="lg" className="bg-gradient-to-r from-blue-700 to-purple-600 shadow-xl px-8 py-4 font-bold rounded-xl">
                   Browse Vehicles
@@ -94,46 +89,34 @@ const Index = () => {
               </Link>
             </div>
           </div>
-          <div className="md:w-1/2 w-full flex items-center justify-center mt-10 md:mt-0">
-            <div className="relative w-full max-w-[520px] md:max-w-[550px] bg-white/5 backdrop-blur-xl rounded-3xl shadow-xl border border-white/10 glass morph">
-              <img
-                src={heroBg}
-                alt="Luxury black car, book a test drive"
-                className="rounded-3xl w-full shadow-2xl object-cover"
-                style={{ minHeight: 260, background: "rgba(32,32,32,0.3)" }}
-              />
-              <div className="absolute inset-0 rounded-3xl bg-black/40 pointer-events-none" />
-            </div>
-          </div>
         </motion.section>
-
         {/* Why Choose Us grid */}
         <section className="py-16">
           <div>
             <h2 className="text-4xl font-bold text-center mb-14 drop-shadow">Why Choose AutoMart? 🏆</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-              <Card className="bg-white/10 dark:bg-[#161a23]/40 backdrop-blur-md border-none shadow-lg hover:shadow-2xl transition-shadow flex flex-col items-center p-7 glass">
+              <Card className="bg-[#1a1d24] backdrop-blur-md border-none shadow-lg hover:shadow-2xl transition-shadow flex flex-col items-center p-7">
                 <CardContent className="p-0 flex flex-col items-center text-center">
                   <Truck className="w-10 h-10 text-blue-400 mb-3" />
                   <h3 className="text-lg font-semibold mb-1">Fast Delivery</h3>
                   <p className="text-slate-300 text-sm">Doorstep delivery across India</p>
                 </CardContent>
               </Card>
-              <Card className="bg-white/10 dark:bg-[#161a23]/40 backdrop-blur-md border-none shadow-lg hover:shadow-2xl transition-shadow flex flex-col items-center p-7 glass">
+              <Card className="bg-[#1a1d24] backdrop-blur-md border-none shadow-lg hover:shadow-2xl transition-shadow flex flex-col items-center p-7">
                 <CardContent className="p-0 flex flex-col items-center text-center">
                   <Shield className="w-10 h-10 text-green-400 mb-3" />
                   <h3 className="text-lg font-semibold mb-1">Verified Quality</h3>
                   <p className="text-slate-300 text-sm">All vehicles checked and certified</p>
                 </CardContent>
               </Card>
-              <Card className="bg-white/10 dark:bg-[#161a23]/40 backdrop-blur-md border-none shadow-lg hover:shadow-2xl transition-shadow flex flex-col items-center p-7 glass">
+              <Card className="bg-[#1a1d24] backdrop-blur-md border-none shadow-lg hover:shadow-2xl transition-shadow flex flex-col items-center p-7">
                 <CardContent className="p-0 flex flex-col items-center text-center">
                   <Clock className="w-10 h-10 text-purple-400 mb-3" />
                   <h3 className="text-lg font-semibold mb-1">24/7 Support</h3>
                   <p className="text-slate-300 text-sm">Always-on customer support</p>
                 </CardContent>
               </Card>
-              <Card className="bg-white/10 dark:bg-[#161a23]/40 backdrop-blur-md border-none shadow-lg hover:shadow-2xl transition-shadow flex flex-col items-center p-7 glass">
+              <Card className="bg-[#1a1d24] backdrop-blur-md border-none shadow-lg hover:shadow-2xl transition-shadow flex flex-col items-center p-7">
                 <CardContent className="p-0 flex flex-col items-center text-center">
                   <Users className="w-10 h-10 text-orange-400 mb-3" />
                   <h3 className="text-lg font-semibold mb-1">Trusted by Thousands</h3>
@@ -143,7 +126,6 @@ const Index = () => {
             </div>
           </div>
         </section>
-
         {/* Featured Cars */}
         <section className="py-14">
           <div className="flex justify-between items-center mb-8">
@@ -154,7 +136,7 @@ const Index = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {getProductsByCategory('car').map((product) => (
-              <Card key={product.id} className="group overflow-hidden bg-gradient-to-br from-white/5 to-black/10 dark:from-[#191a23]/70 dark:to-black/30 backdrop-blur-2xl border border-white/10 shadow-xl hover:scale-105 transition-transform glass">
+              <Card key={product.id} className="group overflow-hidden bg-gradient-to-br from-[#252932] to-black/10 backdrop-blur-2xl border border-white/10 shadow-xl hover:scale-105 transition-transform">
                 <div className="relative">
                   <img
                     src={product.image_url || 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=500'}
@@ -192,8 +174,7 @@ const Index = () => {
               </Card>
             ))}
           </div>
-
-          {/* --- New content: Description & Info Bar --- */}
+          {/* Description & Info Bar */}
           <div className="rounded-xl mt-10 p-6 bg-gradient-to-r from-blue-900/60 to-purple-700/40 backdrop-blur-lg shadow-lg flex flex-col md:flex-row items-center md:justify-between gap-6">
             <p className="text-lg font-medium max-w-xl">
               Discover the most popular cars chosen by our customers. All vehicles are thoroughly inspected and available for rent or purchase with transparent pricing.
@@ -214,23 +195,21 @@ const Index = () => {
             </div>
           </div>
         </section>
-
-        {/* --- Popular Vehicle Brands Section --- */}
+        {/* Popular Vehicle Brands Section */}
         <section className="py-10">
           <h3 className="text-2xl font-bold mb-6 drop-shadow text-center">Popular Vehicle Brands</h3>
           <div className="flex flex-wrap justify-center gap-4 mb-4">
             {["Maruti", "Tata", "Hyundai", "Toyota", "Honda", "Kia", "Suzuki", "Royal Enfield", "Yamaha", "Bajaj"].map((brand) => (
               <div
                 key={brand}
-                className="bg-white/10 backdrop-blur-sm text-white px-5 py-2 rounded-full shadow border border-white/10 text-base font-semibold hover:scale-105 transition"
+                className="bg-[#22252d] text-white px-5 py-2 rounded-full shadow border border-white/10 text-base font-semibold hover:scale-105 transition"
               >
                 {brand}
               </div>
             ))}
           </div>
-          <p className="text-center text-slate-200 max-w-2xl mx-auto">We partner with leading car and bike manufacturers to bring you the widest range of vehicles. Filter by your favorite brand to find your dream ride!</p>
+          <p className="text-center text-slate-400 max-w-2xl mx-auto">We partner with leading car and bike manufacturers to bring you the widest range of vehicles. Filter by your favorite brand to find your dream ride!</p>
         </section>
-
         {/* Featured Bikes */}
         <section className="py-14">
           <div className="flex justify-between items-center mb-8">
@@ -241,7 +220,7 @@ const Index = () => {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {getProductsByCategory('bike').map((product) => (
-              <Card key={product.id} className="group overflow-hidden bg-gradient-to-br from-white/5 to-black/10 dark:from-[#191a23]/70 dark:to-black/30 backdrop-blur-2xl border border-white/10 shadow-xl hover:scale-105 transition-transform glass">
+              <Card key={product.id} className="group overflow-hidden bg-gradient-to-br from-[#252932] to-black/10 backdrop-blur-2xl border border-white/10 shadow-xl hover:scale-105 transition-transform">
                 <div className="relative">
                   <img
                     src={product.image_url || 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=500'}
@@ -279,15 +258,13 @@ const Index = () => {
               </Card>
             ))}
           </div>
-
-          {/* --- New content: Description --- */}
+          {/* Description */}
           <div className="rounded-xl mt-10 p-6 bg-gradient-to-r from-purple-900/60 to-blue-700/40 backdrop-blur-lg shadow-lg flex items-center">
             <p className="text-lg font-medium text-center w-full">
               From speed lovers to everyday commuters, our featured bikes collection has something for everyone. Explore, compare, and book your perfect ride today.
             </p>
           </div>
         </section>
-
         {/* Testimonials */}
         <section className="py-16">
           <div className="max-w-4xl mx-auto text-center">
@@ -304,7 +281,7 @@ const Index = () => {
                   name: "Amit Kumar", loc: "Delhi", quote: "Top quality accessories at unbeatable prices. Will definitely shop again!"
                 }
               ].map((t, idx) => (
-                <Card key={t.name} className="bg-white/10 dark:bg-[#23263b]/40 backdrop-blur-lg border-none shadow-lg hover:shadow-2xl transition-shadow text-left flex flex-col p-7 glass">
+                <Card key={t.name} className="bg-[#191b29] backdrop-blur-lg border-none shadow-lg hover:shadow-2xl transition-shadow text-left flex flex-col p-7">
                   <CardContent className="p-0 flex flex-col flex-1">
                     <div className="flex items-center justify-center mb-4 gap-0.5">
                       {[...Array(5)].map((_, i) => (
@@ -322,7 +299,6 @@ const Index = () => {
             </div>
           </div>
         </section>
-
         {/* CTA Section */}
         <section className="py-16">
           <div className="max-w-4xl mx-auto text-center">
@@ -332,7 +308,7 @@ const Index = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/vehicles">
-                <Button size="lg" variant="secondary" className="text-lg px-8 py-4 bg-white/10 border-white/10 text-white">
+                <Button size="lg" variant="secondary" className="text-lg px-8 py-4 bg-[#1b2333] text-white">
                   Browse Vehicles
                 </Button>
               </Link>
