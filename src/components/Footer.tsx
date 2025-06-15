@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Car, Mail, Phone, MapPin, Facebook, Twitter, Instagram } from 'lucide-react';
 
@@ -7,71 +6,71 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="bg-card border-t border-border text-muted-foreground">
       <div className="container mx-auto px-4 py-12">
         <div className="grid md:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
             <Link to="/" className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
                 <Car className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold">VehicleHub</span>
+              <span className="text-xl font-bold text-primary">VehicleHub</span>
             </Link>
-            <p className="text-gray-400 mb-4">
+            <p className="text-muted-foreground mb-4">
               Your trusted partner for buying and selling vehicles across India.
             </p>
             <div className="flex space-x-4">
-              <Facebook className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer transition-colors" />
-              <Twitter className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer transition-colors" />
-              <Instagram className="w-5 h-5 text-gray-400 hover:text-white cursor-pointer transition-colors" />
+              <Facebook className="w-5 h-5 text-muted-foreground hover:text-primary cursor-pointer transition-colors" />
+              <Twitter className="w-5 h-5 text-muted-foreground hover:text-primary cursor-pointer transition-colors" />
+              <Instagram className="w-5 h-5 text-muted-foreground hover:text-primary cursor-pointer transition-colors" />
             </div>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4 text-foreground">Quick Links</h3>
             <ul className="space-y-2">
-              <li><Link to="/vehicles" className="text-gray-400 hover:text-white transition-colors">Browse Vehicles</Link></li>
-              <li><Link to="/accessories" className="text-gray-400 hover:text-white transition-colors">Accessories</Link></li>
-              <li><Link to="/about" className="text-gray-400 hover:text-white transition-colors">About Us</Link></li>
-              <li><Link to="/contact" className="text-gray-400 hover:text-white transition-colors">Contact</Link></li>
+              <li><Link to="/vehicles" className="text-muted-foreground hover:text-primary transition-colors">Browse Vehicles</Link></li>
+              <li><Link to="/accessories" className="text-muted-foreground hover:text-primary transition-colors">Accessories</Link></li>
+              <li><Link to="/about" className="text-muted-foreground hover:text-primary transition-colors">About Us</Link></li>
+              <li><Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors">Contact</Link></li>
             </ul>
           </div>
 
           {/* Categories */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Categories</h3>
+            <h3 className="text-lg font-semibold mb-4 text-foreground">Categories</h3>
             <ul className="space-y-2">
-              <li><Link to="/vehicles?type=car" className="text-gray-400 hover:text-white transition-colors">Cars</Link></li>
-              <li><Link to="/vehicles?type=bike" className="text-gray-400 hover:text-white transition-colors">Bikes</Link></li>
-              <li><Link to="/accessories?category=interior" className="text-gray-400 hover:text-white transition-colors">Interior</Link></li>
-              <li><Link to="/accessories?category=exterior" className="text-gray-400 hover:text-white transition-colors">Exterior</Link></li>
+              <li><Link to="/vehicles?type=car" className="text-muted-foreground hover:text-primary transition-colors">Cars</Link></li>
+              <li><Link to="/vehicles?type=bike" className="text-muted-foreground hover:text-primary transition-colors">Bikes</Link></li>
+              <li><Link to="/accessories?category=interior" className="text-muted-foreground hover:text-primary transition-colors">Interior</Link></li>
+              <li><Link to="/accessories?category=exterior" className="text-muted-foreground hover:text-primary transition-colors">Exterior</Link></li>
             </ul>
           </div>
 
           {/* Contact Info */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Contact Info</h3>
+            <h3 className="text-lg font-semibold mb-4 text-foreground">Contact Info</h3>
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
-                <Phone className="w-5 h-5 text-blue-400" />
-                <span className="text-gray-400">+91 9999999999</span>
+                <Phone className="w-5 h-5 text-primary" />
+                <span className="text-muted-foreground">+91 9999999999</span>
               </div>
               <div className="flex items-center space-x-3">
-                <Mail className="w-5 h-5 text-blue-400" />
-                <span className="text-gray-400">info@vehiclehub.com</span>
+                <Mail className="w-5 h-5 text-primary" />
+                <span className="text-muted-foreground">info@vehiclehub.com</span>
               </div>
               <div className="flex items-center space-x-3">
-                <MapPin className="w-5 h-5 text-blue-400" />
-                <span className="text-gray-400">Delhi, India</span>
+                <MapPin className="w-5 h-5 text-primary" />
+                <span className="text-muted-foreground">Delhi, India</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-          <p className="text-gray-400">
+        <div className="border-t border-border mt-8 pt-8 text-center">
+          <p className="text-muted-foreground">
             © {currentYear} VehicleHub. All rights reserved.
           </p>
         </div>

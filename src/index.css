@@ -4,89 +4,43 @@
 @tailwind utilities;
 
 @layer base {
+  /* ---- COLOR PALETTE ---- */
   :root {
-    /* shadcn/ui default tokens, customized per brand system */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Brand Colors */
+    --color-primary: 222 100% 36%;                  /* #0F3D91 - Brand Blue */
+    --color-primary-foreground: 0 0% 100%;          /* White on blue */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --color-secondary: 26 100% 52%;                 /* #FF7F1A - Accent Orange */
+    --color-secondary-foreground: 0 0% 100%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --color-success: 142 71% 45%;                   /* green */
+    --color-success-foreground: 0 0% 100%;
+    --color-warning: 45 100% 50%;
+    --color-warning-foreground: 0 0% 0%;
+    --color-error: 0 84.2% 60.2%;
+    --color-error-foreground: 0 0% 100%;
 
-    --primary: 222 100% 32%;            /* #0D47A1 Royal Blue */
-    --primary-foreground: 210 40% 98%;
+    /* Neutral Grays */
+    --color-muted: 222 12% 92%;                     /* neutral very light BG */
+    --color-muted-foreground: 220 12% 40%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --color-background: 0 0% 100%;                  /* default bg: white */
+    --color-foreground: 225 14% 12%;                /* dark text */
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 26 100% 50%;              /* #FF6D00 Sunset Orange */
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 220 14% 75%;
-    --input: 220 14% 75%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    /* Custom additions */
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --color-card: 0 0% 100%;                        /* card/modal bg */
+    --color-border: 222 14% 75%;                    /* light border */
+    --color-input: 222 14% 75%;
   }
-
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 26 100% 50%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-
-    /* Sidebar dark values remain as-is */
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --color-background: 222 43% 6%;                 /* #141924 - deep blue */
+    --color-card: 222 39% 12%;                      /* dark card */
+    --color-muted: 222 20% 16%;
+    --color-foreground: 0 0% 100%;
+    --color-primary: 222 100% 64%;                  /* Lighter royal blue for dark */
+    --color-border: 222 16% 26%;
+    --color-input: 222 16% 26%;
+    --color-secondary: 26 100% 54%;                 /* accent orange for dark */
   }
-
   * {
     box-sizing: border-box;
   }
@@ -97,3 +51,39 @@
 }
 
 @import './styles/fonts.css';
+
+/* Buttons */
+.btn-primary {
+  @apply bg-primary text-primary-foreground font-bold transition-colors shadow-sm rounded-xl px-5 py-2.5 hover:bg-primary/90 focus:ring-2 focus:ring-primary/70;
+}
+.btn-secondary {
+  @apply bg-secondary text-secondary-foreground font-medium rounded-xl px-5 py-2.5 hover:bg-secondary/90 focus:ring-2 focus:ring-secondary/70;
+}
+.btn-outline {
+  @apply border border-border bg-transparent text-foreground font-medium rounded-xl px-5 py-2.5 hover:bg-muted;
+}
+
+/* Cards & Modals */
+.card {
+  @apply bg-card border border-border rounded-2xl shadow-md p-6;
+}
+.card-header {
+  @apply font-heading text-xl pb-2 mb-3 border-b border-border;
+}
+.card-body {
+  @apply text-foreground;
+}
+.card-footer {
+  @apply pt-4 border-t border-border text-right;
+}
+
+/* Input, Label, Form */
+.input,
+select,
+textarea {
+  @apply bg-input border border-border px-3 py-2 rounded-lg shadow-sm focus:ring-primary/40 focus:border-primary transition-all;
+  color: var(--color-foreground);
+}
+.label {
+  @apply font-medium text-muted-foreground mb-0.5;
+}

@@ -17,35 +17,37 @@ export default {
     },
     extend: {
       colors: {
-        // shadcn/ui system tokens
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-
+        // 1. Brand Colors (Name the essentials)
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "hsl(var(--color-primary))", // Royal Blue
+          foreground: "hsl(var(--color-primary-foreground))",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "hsl(var(--color-secondary))", // Sunset Orange
+          foreground: "hsl(var(--color-secondary-foreground))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--color-success))",
+          foreground: "hsl(var(--color-success-foreground))"
+        },
+        warning: {
+          DEFAULT: "hsl(var(--color-warning))",
+          foreground: "hsl(var(--color-warning-foreground))"
+        },
+        error: {
+          DEFAULT: "hsl(var(--color-error))",
+          foreground: "hsl(var(--color-error-foreground))"
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "hsl(var(--color-muted))",
+          foreground: "hsl(var(--color-muted-foreground))"
         },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        // Custom branding
+        background: "hsl(var(--color-background))",
+        foreground: "hsl(var(--color-foreground))",
+        card: "hsl(var(--color-card))",
+        border: "hsl(var(--color-border))",
+        input: "hsl(var(--color-input))",
+        // Old fallback (remove discrete uses)
         "bg-secondary": "#F5F5F5",
         "text-dark": "#1C1C1C",
       },
@@ -58,7 +60,7 @@ export default {
         '2xl': "2rem",
       },
       boxShadow: {
-        md: "0 8px 24px 0 rgba(13,71,161,0.07)",
+        md: "0 8px 24px 0 rgba(13,71,161,0.07)", // Slight blue shadow
         lg: "0 16px 40px 0 rgba(13,71,161,0.15)",
       },
       fontSize: {
@@ -74,6 +76,5 @@ export default {
   },
   plugins: [
     require("tailwindcss-animate"),
-    // Optionally add line-clamp/typography plugins
   ],
 } satisfies Config;
