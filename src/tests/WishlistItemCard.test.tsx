@@ -1,6 +1,5 @@
 
-import { render } from '@testing-library/react';
-import * as rtl from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import { WishlistItemCard, getDetailPath } from '@/components/WishlistItemCard';
@@ -35,8 +34,8 @@ describe('WishlistItemCard', () => {
         <WishlistItemCard item={mockVehicle} view="grid" />
       </BrowserRouter>
     );
-    const btn = rtl.screen.getByTestId('details-btn');
-    rtl.fireEvent.click(btn);
+    const btn = screen.getByTestId('details-btn');
+    fireEvent.click(btn);
     expect(mockNavigate).toHaveBeenCalledWith("/vehicles/uuid-1");
   });
 
@@ -60,8 +59,8 @@ describe('WishlistItemCard', () => {
         <WishlistItemCard item={mockItem} view="list" />
       </BrowserRouter>
     );
-    expect(rtl.screen.getByText("₹12,345")).toBeInTheDocument();
-    expect(rtl.screen.getByAltText("Fancy")).toHaveAttribute("src", "/some.jpg");
+    expect(screen.getByText("₹12,345")).toBeInTheDocument();
+    expect(screen.getByAltText("Fancy")).toHaveAttribute("src", "/some.jpg");
   });
 
   it('Renders fallback image and price correctly', () => {
@@ -84,8 +83,7 @@ describe('WishlistItemCard', () => {
         <WishlistItemCard item={mockItem} view="list" />
       </BrowserRouter>
     );
-    expect(rtl.screen.getByText("--")).toBeInTheDocument();
-    expect(rtl.screen.getByAltText("Lamp")).toHaveAttribute("src", "/placeholder.png");
+    expect(screen.getByText("--")).toBeInTheDocument();
+    expect(screen.getByAltText("Lamp")).toHaveAttribute("src", "/placeholder.png");
   });
 });
-
