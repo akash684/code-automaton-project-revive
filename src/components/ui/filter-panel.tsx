@@ -1,31 +1,8 @@
-import { useState } from "react";
+
+// FilterPanel works for both vehicles and accessories, with generic options arrays
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import {
-  fuelOptions,
-  transmissionOptions,
-  categoryOptions,
-  CategoryOption,
-  BrandOption,
-  FuelOption,
-  TransmissionOption,
-  FuelType,
-  TransmissionType,
-} from "@/constants/options";
-
-type FilterPanelProps = {
-  brands: string[]; // We'll convert to BrandOption[] below
-  categories?: string[];
-  filters: any; // Consider stricter typing in future cleanup
-  onChange: (f: any) => void;
-  minPrice?: number;
-  maxPrice?: number;
-  fuelTypes?: string[]; // We use static from constants, but kept for compatibility
-  transmissionTypes?: string[];
-  withCategory?: boolean;
-};
 
 export function FilterPanel({
   brands,
@@ -37,110 +14,103 @@ export function FilterPanel({
   fuelTypes,
   transmissionTypes,
   withCategory
-}: FilterPanelProps) {
-  // Convert all to label/value
-  const filteredBrands: BrandOption[] = (brands || [])
-    .filter(b => typeof b === "string" && b.trim().length > 0)
-    .map(b => ({ value: b, label: b }));
-
-  const filteredCategories: CategoryOption[] = (categories || [])
-    .filter(c => typeof c === "string" && c.trim().length > 0)
-    .map(c => ({ value: c, label: c }));
-
-  // We always use our local constants for fuel/transmission
-  const filteredFuelTypes: FuelOption[] =
-    (fuelTypes && fuelTypes.length
-      ? fuelTypes.filter(f => typeof f === "string" && f.trim().length > 0).map(f => {
-          const lower = f.toLowerCase();
-          return { value: lower as FuelType, label: f.charAt(0).toUpperCase() + f.slice(1).toLowerCase() };
-        })
-      : fuelOptions);
-
-  const filteredTransmissionTypes: TransmissionOption[] =
-    (transmissionTypes && transmissionTypes.length
-      ? transmissionTypes.filter(t => typeof t === "string" && t.trim().length > 0).map(t => {
-          const lower = t.toLowerCase();
-          return { value: lower as TransmissionType, label: t.charAt(0).toUpperCase() + t.slice(1).toLowerCase() };
-        })
-      : transmissionOptions);
-
-  // Convenience for resetting to placeholder
-  const handleSelect = (key: string, v: string) => {
+}: {
+  brands?: string[];
+  categories?: string[];
+  fuelTypes?: string[];
+  transmissionTypes?: string[];
+  filters: any;
+  onChange: (f: any) => void;
+  minPrice?: number;
+  maxPrice?: number;
+  withCategory?: boolean;
+}) {
+  const handleSelect = (key: string, v: string | undefined) => {
     onChange({ ...filters, [key]: v });
   };
+  // Convert string arrays to value-label
+  const optionize = (arr?: string[]) => (arr || []).map(b => ({ value: b, label: b }));
 
   return (
     <div className="space-y-6 p-4">
-      {withCategory && filteredCategories.length > 0 && (
+      {withCategory && optionize(categories).length > 0 && (
         <div>
           <div className="font-medium mb-1">Category</div>
           <Select
-            value={filters.category ?? undefined}
-            onValueChange={v => handleSelect('category', v)}
+            value={filters.category || ""}
+            onValueChange={v => handleSelect("category", v)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Categories" />
             </SelectTrigger>
             <SelectContent>
-              {filteredCategories.map(opt => (
-                <SelectItem value={opt.value} key={opt.value}>{opt.label}</SelectItem>
+              {optionize(categories).map(opt => (
+                <SelectItem value={opt.value} key={opt.value}>
+                  {opt.label}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
       )}
 
-      {filteredBrands.length > 0 && (
+      {optionize(brands).length > 0 && (
         <div>
           <div className="font-medium mb-1">Brand</div>
           <Select
-            value={filters.brand ?? undefined}
-            onValueChange={v => handleSelect('brand', v)}
+            value={filters.brand || ""}
+            onValueChange={v => handleSelect("brand", v)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Brands" />
             </SelectTrigger>
             <SelectContent>
-              {filteredBrands.map(opt => (
-                <SelectItem value={opt.value} key={opt.value}>{opt.label}</SelectItem>
+              {optionize(brands).map(opt => (
+                <SelectItem value={opt.value} key={opt.value}>
+                  {opt.label}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
       )}
 
-      {filteredFuelTypes.length > 0 && (
+      {optionize(fuelTypes).length > 0 && (
         <div>
           <div className="font-medium mb-1">Fuel</div>
           <Select
-            value={filters.fuel ?? undefined}
-            onValueChange={v => handleSelect('fuel', v)}
+            value={filters.fuel || ""}
+            onValueChange={v => handleSelect("fuel", v)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Fuels" />
             </SelectTrigger>
             <SelectContent>
-              {filteredFuelTypes.map(opt => (
-                <SelectItem value={opt.value} key={opt.value}>{opt.label}</SelectItem>
+              {optionize(fuelTypes).map(opt => (
+                <SelectItem value={opt.value} key={opt.value}>
+                  {opt.label}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
       )}
 
-      {filteredTransmissionTypes.length > 0 && (
+      {optionize(transmissionTypes).length > 0 && (
         <div>
           <div className="font-medium mb-1">Transmission</div>
           <Select
-            value={filters.transmission ?? undefined}
-            onValueChange={v => handleSelect('transmission', v)}
+            value={filters.transmission || ""}
+            onValueChange={v => handleSelect("transmission", v)}
           >
             <SelectTrigger>
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent>
-              {filteredTransmissionTypes.map(opt => (
-                <SelectItem value={opt.value} key={opt.value}>{opt.label}</SelectItem>
+              {optionize(transmissionTypes).map(opt => (
+                <SelectItem value={opt.value} key={opt.value}>
+                  {opt.label}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -152,7 +122,7 @@ export function FilterPanel({
         <Slider
           min={minPrice}
           max={maxPrice}
-          step={5000}
+          step={1000}
           value={filters.priceRange}
           onValueChange={pr => onChange({ ...filters, priceRange: pr })}
         />
@@ -165,11 +135,11 @@ export function FilterPanel({
         variant="outline"
         onClick={() =>
           onChange({
-            brand: undefined,
-            fuel: undefined,
+            brand: "",
+            fuel: "",
             priceRange: [minPrice, maxPrice],
-            transmission: undefined,
-            category: undefined
+            transmission: "",
+            category: ""
           })
         }
       >

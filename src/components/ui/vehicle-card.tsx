@@ -7,7 +7,6 @@ type Vehicle = {
   id: string;
   name: string;
   brand: string;
-  type: string;
   fuel: string;
   price: number;
   image_url?: string;
