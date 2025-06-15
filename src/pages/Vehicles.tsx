@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { DEFAULT_PRICE_RANGE } from "@/constants/price";
 import type { Database } from "@/integrations/supabase/types";
 import { Vehicle } from "@/types/supabase";
+import { VehicleCard } from "@/components/ui/vehicle-card";
 
 // Correct VehicleRow based on your schema
 type VehicleRow = Database["public"]["Tables"]["vehicles"]["Row"];
@@ -208,15 +209,10 @@ export default function Vehicles() {
             ) : vehiclesQuery.isError ? (
               <div className="py-32 text-center text-error">Error loading vehicles.</div>
             ) : vehiclesQuery.data?.length ? (
-              <div>
+              // vehicle grid/card list
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {vehiclesQuery.data.map(vehicle => (
-                  <div key={vehicle.id} className="p-4 mb-4 rounded-lg border bg-card">
-                    <div className="font-bold">{vehicle.brand} {vehicle.model}</div>
-                    <div>{vehicle.category}</div>
-                    <div>Fuel: {vehicle.fuel}</div>
-                    <div>Transmission: {vehicle.transmission}</div>
-                    <div>Price: ₹{vehicle.price}</div>
-                  </div>
+                  <VehicleCard key={vehicle.id} vehicle={vehicle} />
                 ))}
               </div>
             ) : (
