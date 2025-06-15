@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useWishlist } from "@/hooks/useWishlist";
 import { Button } from "@/components/ui/button";
@@ -258,6 +257,48 @@ function WishlistCard({
   removing: boolean;
   onRemove: () => void;
 }) {
+  // Gather display data depending on type
+  const isProduct = item.item_type === "product" && item.product;
+  const isVehicle = item.item_type === "vehicle" && item.product == null && !!item.brand;
+  const isAccessory = item.item_type === "accessory" && item.product == null && !!item.name;
+
+  // Unified fields
+  let image = item.product?.image_url || item.image_url || "/placeholder.svg";
+  let title =
+    item.product?.name ||
+    item.title ||
+    item.brand && item.model ? `${item.brand} ${item.model}` : 
+    item.brand ||
+    item.name ||
+    "Item";
+  let price =
+    getPrice(item) ||
+    item.price ||
+    item.product?.price_inr ||
+    undefined;
+  let stock =
+    item.product?.in_stock ??
+    item.product?.available ??
+    item.available ??
+    true;
+  let category =
+    item.product?.category ||
+    item.category ||
+    item.product?.type ||
+    item.type ||
+    (item.item_type === "vehicle" ? "Vehicle" : item.item_type === "accessory" ? "Accessory" : "Misc");
+
+  let rating =
+    item.product?.rating ||
+    item.rating ||
+    undefined;
+
+  let brand =
+    item.product?.brand ||
+    item.brand ||
+    undefined;
+
+  // Card Actions link (reuse old logic with fallback)
   const detailsLink =
     item.item_type === "product"
       ? `/products/${item.product?.slug ?? item.product_id}`
@@ -274,27 +315,74 @@ function WishlistCard({
     exit: { opacity: 0, y: 60, scale: 0.95, transition: { duration: 0.35 } },
   };
 
+  // Responsive/variant styles
   const cardStyles =
     view === "grid"
       ? "rounded-2xl shadow-xl bg-slate-800/90 border border-slate-700 hover:shadow-2xl ring-1 ring-transparent hover:ring-fuchsia-600 transition-all duration-150 flex flex-col min-h-[420px] relative"
       : "rounded-xl shadow-lg bg-slate-800/95 border border-slate-700 flex flex-row items-center gap-4 p-3 min-h-[110px] hover:ring-2 hover:ring-fuchsia-500 relative";
 
+  // Image box, new: works for all types
   const imageBox =
     <div className={cn(
       "bg-slate-900 border border-slate-700 rounded-lg overflow-hidden flex items-center justify-center transition-transform duration-300 relative",
       view === "grid" ? "h-44 w-full mb-3" : "h-24 w-24 mr-5"
     )}>
       <img
-        src={item.product?.image_url || "/placeholder.svg"}
-        alt={item.product?.name || "Wishlist Item"}
+        src={image}
+        alt={title}
         className={cn("object-cover transition-transform duration-300 hover:scale-110", view === "grid" ? "w-full h-full" : "h-full w-full")}
         loading="lazy"
       />
       {/* Stock Badge */}
-      <span className={cn(badgeClasses(item.product?.in_stock ?? item.product?.available ?? true), "absolute top-2 left-2 z-10")}>
-        {(item.product?.in_stock ?? item.product?.available ?? true) ? "In Stock" : "Out of Stock"}
+      <span className={cn(badgeClasses(stock), "absolute top-2 left-2 z-10")}>
+        {stock ? "In Stock" : "Out of Stock"}
       </span>
     </div>;
+
+  // Modern tags / chips builder
+  const tags = (
+    <div className="flex flex-wrap gap-1 text-xs text-slate-400 mb-1">
+      {category && (
+        <span className="bg-slate-700 rounded-full px-2 py-0.5">{category}</span>
+      )}
+      {brand && (
+        <span className="border border-slate-600 rounded-full px-2 py-0.5">{brand}</span>
+      )}
+      {item.product?.type && !item.product?.category && (
+        <span className="bg-slate-700 rounded-full px-2 py-0.5">{item.product?.type}</span>
+      )}
+    </div>
+  );
+
+  // Responsive action buttons, visible for all
+  const actions = (
+    <div className="flex flex-wrap gap-2 mt-auto">
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label="Remove"
+        className="hover:bg-pink-900/60 text-pink-400"
+        onClick={onRemove}
+      >
+        <Trash2 className="w-5 h-5" />
+      </Button>
+      <Link to={detailsLink}>
+        <Button variant="outline" size="sm" className="border-cyan-600 text-cyan-400 hover:bg-cyan-900/30">
+          <Eye className="w-4 h-4 mr-2" />
+          {view === "grid" ? "View Details" : "Details"}
+        </Button>
+      </Link>
+      <Button
+        variant="secondary"
+        size="sm"
+        className="bg-gradient-to-r from-cyan-600 to-fuchsia-600 text-white font-bold hover:from-cyan-500 hover:to-fuchsia-500"
+        disabled={!stock}
+      >
+        <ShoppingCart className="w-4 h-4 mr-2" />
+        {stock ? (view === "grid" ? "Buy Now" : "Buy") : "Unavailable"}
+      </Button>
+    </div>
+  );
 
   return (
     <motion.div
@@ -306,113 +394,41 @@ function WishlistCard({
       className={cardStyles}
       style={removing ? { pointerEvents: "none", opacity: 0.6 } : {}}
     >
-      {/* CARD CONTENT */}
       {view === "grid" ? (
-        // Grid View Card Body
         <>
           {imageBox}
           <div className="flex-1 flex flex-col gap-1 px-2 pb-2">
-            <Link 
+            <Link
               to={detailsLink}
               className="hover:text-cyan-400 text-lg font-bold text-white mb-0.5 line-clamp-2"
             >
-              {item.product?.name || "Item"}
+              {title}
             </Link>
-            <div className="flex flex-wrap gap-1 text-xs text-slate-400 mb-1">
-              {item.product?.category && (
-                <span className="bg-slate-700 rounded-full px-2 py-0.5">{item.product?.category}</span>
-              )}
-              {item.product?.brand && (
-                <span className="border border-slate-600 rounded-full px-2 py-0.5">{item.product.brand}</span>
-              )}
-              {item.product?.type && !item.product?.category && (
-                <span className="bg-slate-700 rounded-full px-2 py-0.5">{item.product?.type}</span>
-              )}
-            </div>
+            {tags}
             <div className="flex items-center gap-2 mb-1 mt-2">
               <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-fuchsia-400 text-transparent bg-clip-text">
-                ₹{getPrice(item) ? new Intl.NumberFormat("en-IN").format(getPrice(item)) : "--"}
+                ₹{price !== undefined ? new Intl.NumberFormat("en-IN").format(price) : "--"}
               </span>
-              {getRatingStars(item.product?.rating)}
+              {getRatingStars(rating)}
             </div>
-            {/* Card Actions */}
-            <div className="flex flex-wrap gap-2 mt-auto">
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Remove"
-                className="hover:bg-pink-900/60 text-pink-400"
-                onClick={onRemove}
-              >
-                <Trash2 className="w-5 h-5" />
-              </Button>
-              <Link to={detailsLink}>
-                <Button variant="outline" size="sm" className="border-cyan-600 text-cyan-400 hover:bg-cyan-900/30">
-                  <Eye className="w-4 h-4 mr-2" />
-                  View Details
-                </Button>
-              </Link>
-              <Button
-                variant="secondary"
-                size="sm"
-                className="bg-gradient-to-r from-cyan-600 to-fuchsia-600 text-white font-bold hover:from-cyan-500 hover:to-fuchsia-500"
-              >
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                Buy Now
-              </Button>
-            </div>
+            {actions}
           </div>
         </>
       ) : (
-        // List View Card Body
         <>
           {imageBox}
           <div className="flex flex-1 flex-col gap-1">
             <Link to={detailsLink} className="hover:text-cyan-400 text-base font-bold text-white">
-              {item.product?.name || "Item"}
+              {title}
             </Link>
-            <div className="flex flex-wrap gap-1 text-xs text-slate-400 mb-1">
-              {item.product?.category && (
-                <span className="bg-slate-700 rounded-full px-2 py-0.5">{item.product?.category}</span>
-              )}
-              {item.product?.brand && (
-                <span className="border border-slate-600 rounded-full px-2 py-0.5">{item.product.brand}</span>
-              )}
-              {item.product?.type && !item.product?.category && (
-                <span className="bg-slate-700 rounded-full px-2 py-0.5">{item.product?.type}</span>
-              )}
-            </div>
+            {tags}
             <div className="flex items-center gap-2">
               <span className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-fuchsia-400 text-transparent bg-clip-text">
-                ₹{getPrice(item) ? new Intl.NumberFormat("en-IN").format(getPrice(item)) : "--"}
+                ₹{price !== undefined ? new Intl.NumberFormat("en-IN").format(price) : "--"}
               </span>
-              {getRatingStars(item.product?.rating)}
+              {getRatingStars(rating)}
             </div>
-            <div className="flex gap-2 mt-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Remove"
-                className="hover:bg-pink-900/60 text-pink-400"
-                onClick={onRemove}
-              >
-                <Trash2 className="w-5 h-5" />
-              </Button>
-              <Link to={detailsLink}>
-                <Button variant="outline" size="sm" className="border-cyan-600 text-cyan-400">
-                  <Eye className="w-4 h-4 mr-2" />
-                  Details
-                </Button>
-              </Link>
-              <Button
-                variant="secondary"
-                size="sm"
-                className="bg-gradient-to-r from-cyan-600 to-fuchsia-600 text-white font-bold hover:from-cyan-500 hover:to-fuchsia-500"
-              >
-                <ShoppingCart className="w-4 h-4 mr-2" />
-                Buy
-              </Button>
-            </div>
+            <div className="flex gap-2 mt-2">{actions}</div>
           </div>
         </>
       )}
