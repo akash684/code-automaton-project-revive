@@ -11,6 +11,11 @@ import { VehicleCard } from "@/components/ui/vehicle-card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
 import { useState } from "react";
+import { ModernCard } from "@/components/ui/modern-card";
+import { AnimatedEmpty } from "@/components/ui/animated-empty";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 
 const DEFAULT_PRICE_RANGE: [number, number] = [500, 2000000];
 
@@ -68,8 +73,8 @@ export default function Vehicles() {
       <main className="container mx-auto py-10">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar */}
-          <aside className="md:w-64 mb-4 shrink-0">
-            <div className="space-y-6 p-4 rounded bg-white shadow">
+          <aside className="md:w-72 mb-4 shrink-0">
+            <div className="space-y-6 p-6 rounded-2xl shadow bg-white/70 dark:bg-gray-900/50 backdrop-blur-lg">
               {/* Vehicle Type */}
               <div>
                 <div className="font-medium mb-1">Type</div>
@@ -87,7 +92,6 @@ export default function Vehicles() {
                   </SelectContent>
                 </Select>
               </div>
-
               {/* Brand */}
               <div>
                 <div className="font-medium mb-1">Brand</div>
@@ -108,7 +112,6 @@ export default function Vehicles() {
                   </SelectContent>
                 </Select>
               </div>
-
               {/* Fuel */}
               <div>
                 <div className="font-medium mb-1">Fuel</div>
@@ -129,7 +132,6 @@ export default function Vehicles() {
                   </SelectContent>
                 </Select>
               </div>
-
               {/* Transmission */}
               <div>
                 <div className="font-medium mb-1">Transmission</div>
@@ -150,7 +152,6 @@ export default function Vehicles() {
                   </SelectContent>
                 </Select>
               </div>
-
               {/* Price */}
               <div>
                 <div className="font-medium mb-1">Price</div>
@@ -175,11 +176,10 @@ export default function Vehicles() {
                   <span>₹{filters.priceRange[1]}</span>
                 </div>
               </div>
-
               {/* Reset */}
-              <button className="text-blue-700 mt-3 w-full" onClick={handleReset}>
+              <Button className="mt-3 w-full" variant="outline" onClick={handleReset}>
                 Reset Filters
-              </button>
+              </Button>
             </div>
           </aside>
           {/* Main content */}
@@ -189,7 +189,7 @@ export default function Vehicles() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Search by Model…"
-                className="md:max-w-xs"
+                className="md:max-w-xs bg-white/80 dark:bg-gray-900/70"
               />
               {/* Sort */}
               <Select value={sort} onValueChange={setSort}>
@@ -202,7 +202,7 @@ export default function Vehicles() {
                 </SelectContent>
               </Select>
             </div>
-            {/* Loading state */}
+            {/* Loading/Empty/Results */}
             {vehiclesQuery.isLoading ? (
               <div className="py-32 text-center text-gray-500 animate-pulse">Loading...</div>
             ) : vehiclesQuery.isError ? (
@@ -210,17 +210,48 @@ export default function Vehicles() {
             ) : vehiclesQuery.data?.length ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {vehiclesQuery.data.map((vehicle: any) => (
-                  <VehicleCard key={vehicle.id} vehicle={vehicle} />
+                  <ModernCard key={vehicle.id} className="overflow-hidden">
+                    <motion.div
+                      className="relative w-full h-44 overflow-hidden"
+                      whileHover={{ scale: 1.05 }}
+                    >
+                      <img
+                        src={vehicle.image_url || "/placeholder.svg"}
+                        alt={vehicle.model}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                        style={{ objectFit: "cover" }}
+                      />
+                      <Badge
+                        className={`absolute top-3 left-3 capitalize ${
+                          vehicle.available ? "bg-green-500" : "bg-gray-400"
+                        } text-white`}
+                      >
+                        {vehicle.available ? "Available" : "Unavailable"}
+                      </Badge>
+                      <Badge className="absolute top-3 right-3 bg-blue-700 text-white capitalize">
+                        {vehicle.category}
+                      </Badge>
+                    </motion.div>
+                    <CardContent className="p-5">
+                      <div className="mb-1 font-heading text-lg font-semibold">{vehicle.model}</div>
+                      <div className="flex flex-wrap gap-2 text-sm text-gray-600 mb-2">
+                        <Badge variant="outline" className="bg-white/50 dark:bg-gray-800/50">{vehicle.brand}</Badge>
+                        <Badge variant="outline" className="bg-white/50 dark:bg-gray-800/50">{vehicle.fuel}</Badge>
+                        <Badge variant="outline" className="bg-white/50 dark:bg-gray-800/50">{vehicle.transmission}</Badge>
+                      </div>
+                      <div className="text-2xl font-bold text-blue-700 mb-3">
+                        ₹{new Intl.NumberFormat("en-IN").format(vehicle.price)}
+                      </div>
+                      <Button className="w-full" disabled={!vehicle.available}>
+                        {vehicle.available ? "Rent / Buy" : "Unavailable"}
+                      </Button>
+                    </CardContent>
+                  </ModernCard>
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center py-32 text-gray-500">
-                <img src="/placeholder.svg" alt="" className="w-16 h-16 mb-2 opacity-40" />
-                <div className="text-xl font-medium">No results found</div>
-                <button className="text-blue-700 mt-3" onClick={handleReset}>
-                  Reset Filters
-                </button>
-              </div>
+              <AnimatedEmpty message="No vehicles available right now." onReset={handleReset} />
             )}
           </section>
         </div>

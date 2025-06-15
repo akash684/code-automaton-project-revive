@@ -10,6 +10,8 @@ import { toast } from 'sonner';
 import { BrandDisplayText } from "@/components/BrandDisplayText";
 import { BrandButton } from "@/components/BrandButton";
 import { HomeHeroBg } from "@/components/HomeHeroBg";
+import { Navbar } from "@/components/ui/navbar";
+import { motion } from "framer-motion";
 
 const Index = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -59,20 +61,27 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
-      {/* Hero Section */}
-      <HomeHeroBg>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 transition-colors duration-300">
+      <Navbar onToggleDark={() => document.documentElement.classList.toggle('dark')} />
+      {/* Hero Section w/ glass effect */}
+      <motion.section
+        className="relative bg-white/60 dark:bg-gray-950/60 backdrop-blur-lg rounded-2xl shadow-xl container mx-auto mt-10 py-12 px-6 flex flex-col items-center"
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7 }}
+      >
         <BrandDisplayText>
           AI-Powered Vehicle Recommendations
         </BrandDisplayText>
-        <p className="text-lg md:text-2xl text-balance mt-6 mb-6 text-gray-100 font-body">
+        <p className="text-lg md:text-2xl text-balance mt-6 mb-6 text-gray-700 dark:text-gray-100 font-body">
           Let our smart assistant help you find the ideal vehicle for Indian roads and your&nbsp;budget
         </p>
-        {/* Example button */}
-        <div className="flex justify-center mt-6">
-          <BrandButton className="text-lg px-10 py-3 rounded-2xl bg-accent">Search Vehicles</BrandButton>
+        <div className="flex justify-center mt-6 gap-3">
+          <BrandButton className="text-lg px-10 py-3 rounded-2xl bg-accent glassmorphism">
+            Search Vehicles
+          </BrandButton>
         </div>
-      </HomeHeroBg>
+      </motion.section>
 
       {/* Why Choose Us */}
       <section className="py-20 px-4">
