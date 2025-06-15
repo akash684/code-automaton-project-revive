@@ -92,7 +92,9 @@ export interface CartItem {
 export interface WishlistItem {
   id: string;
   user_id: string;
-  product_id: number;
+  product_id?: number | null;
+  item_uuid?: string | null; // Added for vehicles/accessories
+  item_type?: 'product' | 'vehicle' | 'accessory' | null; // Extended
   created_at: string;
   product?: Product;
 }

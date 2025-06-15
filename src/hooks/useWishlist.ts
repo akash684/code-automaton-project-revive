@@ -66,7 +66,7 @@ export const useWishlist = () => {
         return false;
       }
 
-      const insertData: any = {
+      const insertData: Partial<WishlistItem> = {
         user_id: user.id,
         item_type: itemType,
       };
@@ -147,3 +147,5 @@ export const useWishlist = () => {
     refetch: fetchWishlistItems
   };
 };
+
+// ... nothing else changed ...
