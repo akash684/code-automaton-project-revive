@@ -17,14 +17,37 @@ export default {
     },
     extend: {
       colors: {
-        // Branding
-        primary: { DEFAULT: '#0D47A1' }, // Royal Blue
-        accent:  { DEFAULT: '#FF6D00' }, // Sunset Orange
-        background: '#FFFFFF', // Pure White
-        'bg-secondary': '#F5F5F5',
-        'text-dark': '#1C1C1C',
-        // Gray/Neutral for borders & subtle backgrounds
-        muted:  '#ECECEC',
+        // shadcn/ui system tokens
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        // Custom branding
+        "bg-secondary": "#F5F5F5",
+        "text-dark": "#1C1C1C",
       },
       fontFamily: {
         heading: ["Montserrat", "Arial", "sans-serif"],
@@ -35,10 +58,9 @@ export default {
         '2xl': "2rem",
       },
       boxShadow: {
-        md: "0 8px 24px 0 rgba(13,71,161,0.07)",   // Royal soft
-        lg: "0 16px 40px 0 rgba(13,71,161,0.15)",  // deeper on hover
+        md: "0 8px 24px 0 rgba(13,71,161,0.07)",
+        lg: "0 16px 40px 0 rgba(13,71,161,0.15)",
       },
-      // Responsive font sizing
       fontSize: {
         'display': ['clamp(2.2rem, 6vw, 3.8rem)', { lineHeight: '1.1', fontWeight: '700', letterSpacing: '-.03em' }],
       },
