@@ -1,5 +1,5 @@
 
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react'; // Fixed imports
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import { WishlistItemCard, getDetailPath } from '@/components/WishlistItemCard';
@@ -62,3 +62,4 @@ describe('WishlistItemCard', () => {
     expect(screen.getByAltText("Fancy")).toHaveAttribute("src", "/some.jpg");
   });
 });
+

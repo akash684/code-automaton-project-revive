@@ -4,7 +4,7 @@ import { Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
-import { WishlistItem } from "@/hooks/useWishlist";
+import type { WishlistItem } from "@/types"; // Fixed import
 
 // badge utility for stock
 const badgeClasses = (inStock: boolean) =>
@@ -90,3 +90,4 @@ export const WishlistItemCard: React.FC<WishlistItemCardProps> = ({ item, view }
     </div>
   );
 };
+
