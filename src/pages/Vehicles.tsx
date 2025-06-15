@@ -10,7 +10,7 @@ import {
 import { VehicleCard } from "@/components/ui/vehicle-card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ModernCard } from "@/components/ui/modern-card";
 import { AnimatedEmpty } from "@/components/ui/animated-empty";
 import { Badge } from "@/components/ui/badge";
@@ -34,55 +34,45 @@ export default function Vehicles() {
   });
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("price-asc");
-  const [buyModalOpen, setBuyModalOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any>(null);
+  // Remove buyModalOpen and selectedItem, since we use Razorpay flow now:
+  // const [buyModalOpen, setBuyModalOpen] = useState(false);
+  // const [selectedItem, setSelectedItem] = useState<any>(null);
 
   // Dynamic filter options
   const brandsQuery = useQuery<string[]>({ queryKey: ["vehicle-brands"], queryFn: fetchVehicleBrands });
   const fuelQuery = useQuery<string[]>({ queryKey: ["vehicle-fuels"], queryFn: fetchVehicleFuelTypes });
   const transQuery = useQuery<string[]>({ queryKey: ["vehicle-transmissions"], queryFn: fetchVehicleTransmissions });
 
-  // Main fetch, revised logic for all/cars/bikes
+  // ——— FETCH LOGIC: Always fetch cars/bikes per filters ———
   const vehiclesQuery = useQuery({
     queryKey: ["vehicles", filters, search, sort],
     queryFn: async () => {
       const { supabase } = await import("@/integrations/supabase/client");
       let query = supabase.from("products").select("*");
 
-      // Filter cars/bikes if a specific type is selected, else fetch all
+      // If a category filter is set (car or bike)
       if (filters.category !== "all") {
-        query = query.eq("category", filters.category); // 'car' or 'bike'
+        query = query.eq("category", filters.category);
       } else {
-        // Show only products that are cars or bikes (not accessories)
+        // Show only cars or bikes, never accessories
         query = query.in("category", ["car", "bike"]);
       }
 
-      // Search by model
-      if (search) {
-        query = query.ilike("model", `%${search}%`);
-      }
-
-      // Sort
-      if (sort === "price-asc") {
-        query = query.order("price", { ascending: true });
-      } else if (sort === "price-desc") {
-        query = query.order("price", { ascending: false });
-      }
-
-      // Optionally: filter brand, fuel, transmission, priceRange
+      if (search) query = query.ilike("model", `%${search}%`);
+      if (sort === "price-asc") query = query.order("price", { ascending: true });
+      else if (sort === "price-desc") query = query.order("price", { ascending: false });
       if (filters.brand !== "all") query = query.eq("brand", filters.brand);
       if (filters.fuel !== "all") query = query.eq("fuel", filters.fuel);
       if (filters.transmission !== "all") query = query.eq("transmission", filters.transmission);
 
       if (
         filters.priceRange &&
-        (filters.priceRange[0] !== 500 || filters.priceRange[1] !== 2000000)
+        (filters.priceRange[0] !== DEFAULT_PRICE_RANGE[0] || filters.priceRange[1] !== DEFAULT_PRICE_RANGE[1])
       ) {
         query = query
           .gte("price", filters.priceRange[0])
           .lte("price", filters.priceRange[1]);
       }
-
       const { data, error } = await query;
       if (error) {
         console.error("Failed to fetch vehicles:", error.message);
@@ -93,6 +83,43 @@ export default function Vehicles() {
   });
 
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+
+  // Razorpay Integration handler — can be converted to actual Razorpay with a public key!
+  async function handleBuyNow(vehicle: any) {
+    // If Razorpay is not loaded, show a toast and fallback to mock success
+    if (!window.Razorpay) {
+      // @ts-ignore
+      import('sonner').then(({ toast }) => toast.info("Razorpay not integrated in this demo - simulate payment success! 🎉"));
+      // Optionally: logic to save as purchased in Supabase/orders
+      return;
+    }
+    // Razorpay checkout options
+    const options = {
+      key: "rzp_test_XXXXXXXXXXXX", // Replace this with your Razorpay public key!
+      amount: Math.round(Number(vehicle.price) * 100), // INR in paise
+      currency: "INR",
+      name: "Vehicle Purchase",
+      description: `Buy ${vehicle.brand} ${vehicle.model}`,
+      image: vehicle.image_url, // Logo or vehicle image URL
+      handler: function (response: any) {
+        // @ts-ignore
+        import('sonner').then(({ toast }) => toast.success(`Payment successful! Payment ID: ${response.razorpay_payment_id}`));
+        // Here, record purchase in Supabase if desired
+      },
+      prefill: {
+        name: "",
+        email: "",
+      },
+      notes: {
+        model: vehicle.model,
+        brand: vehicle.brand,
+      },
+      theme: { color: "#3b82f6" }
+    };
+    // @ts-ignore
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  }
 
   // Reset logic to "all" instead of ""
   const handleReset = () => {
@@ -259,13 +286,14 @@ export default function Vehicles() {
             ) : vehiclesQuery.isError ? (
               <div className="py-32 text-center text-error">Error loading vehicles.</div>
             ) : vehiclesQuery.data?.length ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {vehiclesQuery.data.map((vehicle: any) => (
-                  <div key={vehicle.id} className="overflow-hidden bg-card text-foreground border border-border rounded-2xl transition-shadow hover:shadow-lg">
-                    <motion.div
-                      className="relative w-full h-44 overflow-hidden"
-                      whileHover={{ scale: 1.05 }}
-                    >
+                  <div
+                    key={vehicle.id}
+                    className="overflow-hidden bg-card text-foreground border border-border rounded-2xl transition-shadow hover:shadow-lg flex flex-col"
+                    aria-label={`${vehicle.brand ?? ''} ${vehicle.model}`}
+                  >
+                    <div className="relative w-full h-44 overflow-hidden">
                       <img
                         src={vehicle.image_url || "/placeholder.svg"}
                         alt={vehicle.model}
@@ -273,52 +301,40 @@ export default function Vehicles() {
                         loading="lazy"
                         style={{ objectFit: "cover" }}
                       />
-                      <Badge
-                        className={`absolute top-3 left-3 capitalize ${
-                          vehicle.available ? "bg-green-500" : "bg-gray-400"
-                        } text-white`}
+                      <span
+                        className={`absolute top-3 left-3 capitalize px-2 py-1 rounded font-bold text-xs ${
+                          vehicle.available ? "bg-green-500 text-white" : "bg-gray-400 text-white"
+                        }`}
+                        role="status"
+                        aria-label={vehicle.available ? "Available" : "Unavailable"}
                       >
                         {vehicle.available ? "Available" : "Unavailable"}
-                      </Badge>
-                      <Badge className="absolute top-3 right-3 bg-blue-700 text-white capitalize">
+                      </span>
+                      <span className="absolute top-3 right-3 bg-blue-700 text-white capitalize px-2 py-1 rounded font-bold text-xs">
                         {vehicle.category}
-                      </Badge>
-                    </motion.div>
-                    <CardContent className="p-5">
+                      </span>
+                    </div>
+                    <div className="flex-1 flex flex-col p-5">
                       <div className="mb-1 font-heading text-lg font-semibold">{vehicle.model}</div>
                       <div className="flex flex-wrap gap-2 text-sm text-gray-300 mb-2">
-                        <Badge variant="outline" className="bg-white/10 border-gray-800 dark:bg-gray-800/50">{vehicle.brand}</Badge>
-                        <Badge variant="outline" className="bg-white/10 border-gray-800 dark:bg-gray-800/50">{vehicle.fuel}</Badge>
-                        <Badge variant="outline" className="bg-white/10 border-gray-800 dark:bg-gray-800/50">{vehicle.transmission}</Badge>
+                        <span className="bg-white/10 border border-gray-800 dark:bg-gray-800/50 rounded px-2 py-0.5">{vehicle.brand}</span>
+                        <span className="bg-white/10 border border-gray-800 dark:bg-gray-800/50 rounded px-2 py-0.5">{vehicle.fuel}</span>
+                        <span className="bg-white/10 border border-gray-800 dark:bg-gray-800/50 rounded px-2 py-0.5">{vehicle.transmission}</span>
                       </div>
                       <div className="text-2xl font-bold text-blue-400 mb-3">
                         ₹{new Intl.NumberFormat("en-IN").format(vehicle.price)}
                       </div>
-                      <div className="flex gap-2">
-                        <Button
-                          className="flex-1 bg-gradient-to-r from-blue-700 to-purple-700 text-white"
-                          disabled={!vehicle.available}
-                          onClick={() => {
-                            setSelectedItem({
-                              name: vehicle.model,
-                              price: vehicle.price,
-                              image_url: vehicle.image_url
-                            });
-                            setBuyModalOpen(true);
-                          }}
-                        >
-                          Buy Now
-                        </Button>
-                      </div>
-                    </CardContent>
+                      <button
+                        className="flex-1 bg-gradient-to-r from-blue-700 to-purple-700 text-white font-bold py-2 px-4 rounded-xl mt-auto w-full transition-colors hover:from-blue-800 hover:to-purple-800 disabled:bg-gray-400"
+                        disabled={!vehicle.available}
+                        aria-label="Buy Now"
+                        onClick={() => handleBuyNow(vehicle)}
+                      >
+                        Buy Now
+                      </button>
+                    </div>
                   </div>
                 ))}
-                <BuyModal
-                  open={buyModalOpen}
-                  onOpenChange={setBuyModalOpen}
-                  item={selectedItem || { name: "", price: 0 }}
-                  itemType="Vehicle"
-                />
               </div>
             ) : (
               <AnimatedEmpty message="No vehicles available right now." onReset={handleReset} />
@@ -326,6 +342,23 @@ export default function Vehicles() {
           </section>
         </div>
       </main>
+      {/* Razorpay embed script loader - only loads once, idempotent */}
+      <RazorpayScriptLoader />
     </div>
   );
+}
+
+// --- Razorpay Script Loader (loads the checkout script if not present) ---
+function RazorpayScriptLoader() {
+  // Only load if not already present
+  useEffect(() => {
+    if (typeof window !== "undefined" && !window.Razorpay) {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.async = true;
+      script.id = "razorpay-js";
+      document.body.appendChild(script);
+    }
+  }, []);
+  return null;
 }
