@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +14,6 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { addToCart } = useCart();
-  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -32,16 +30,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     }
   };
 
-  const handleWishlistToggle = async () => {
-    if (isInWishlist(product.id)) {
-      await removeFromWishlist(product.id);
-    } else {
-      await addToWishlist(product.id);
-    }
-  };
-
-  const isWishlisted = isInWishlist(product.id);
-
   return (
     <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300">
       <div className="relative">
@@ -50,16 +38,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           alt={product.name}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
-        <div className="absolute top-4 right-4">
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            className={`bg-white/90 hover:bg-white ${isWishlisted ? 'text-red-500' : ''}`}
-            onClick={handleWishlistToggle}
-          >
-            <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
-          </Button>
-        </div>
         {product.featured && (
           <Badge className="absolute top-4 left-4 bg-gradient-to-r from-blue-600 to-purple-600">
             Featured
