@@ -42,31 +42,51 @@ export default function Vehicles() {
   const fuelQuery = useQuery<string[]>({ queryKey: ["vehicle-fuels"], queryFn: fetchVehicleFuelTypes });
   const transQuery = useQuery<string[]>({ queryKey: ["vehicle-transmissions"], queryFn: fetchVehicleTransmissions });
 
-  // Main fetch, map "all" to undefined for backend
+  // Main fetch, revised logic for all/cars/bikes
   const vehiclesQuery = useQuery({
-    queryKey: [
-      "vehicles",
-      filters,
-      search,
-      sort
-    ],
+    queryKey: ["vehicles", filters, search, sort],
     queryFn: async () => {
-      // NEW: Fetch from 'products' table just bikes
-      const { data, error } = await import("@/integrations/supabase/client").then(({ supabase }) =>
-        supabase
-          .from('products')
-          .select('*')
-          .eq('category', filters.category === "all" ? undefined : filters.category === "bike" ? "bike" : filters.category)
-          .ilike('model', `%${search}%`)
-          .order(sort === "price-asc" ? "price" : "price", { ascending: sort === "price-asc" })
-      );
-      if (error) {
-        console.error("Failed to fetch bikes:", error.message);
-        return [];
+      const { supabase } = await import("@/integrations/supabase/client");
+      let query = supabase.from("products").select("*");
+
+      // Filter cars/bikes if a specific type is selected, else fetch all
+      if (filters.category !== "all") {
+        query = query.eq("category", filters.category); // 'car' or 'bike'
+      } else {
+        // Show only products that are cars or bikes (not accessories)
+        query = query.in("category", ["car", "bike"]);
       }
-      // Only return bikes if "bike", else fallback to all
-      if (filters.category === "bike") {
-        return data ?? [];
+
+      // Search by model
+      if (search) {
+        query = query.ilike("model", `%${search}%`);
+      }
+
+      // Sort
+      if (sort === "price-asc") {
+        query = query.order("price", { ascending: true });
+      } else if (sort === "price-desc") {
+        query = query.order("price", { ascending: false });
+      }
+
+      // Optionally: filter brand, fuel, transmission, priceRange
+      if (filters.brand !== "all") query = query.eq("brand", filters.brand);
+      if (filters.fuel !== "all") query = query.eq("fuel", filters.fuel);
+      if (filters.transmission !== "all") query = query.eq("transmission", filters.transmission);
+
+      if (
+        filters.priceRange &&
+        (filters.priceRange[0] !== 500 || filters.priceRange[1] !== 2000000)
+      ) {
+        query = query
+          .gte("price", filters.priceRange[0])
+          .lte("price", filters.priceRange[1]);
+      }
+
+      const { data, error } = await query;
+      if (error) {
+        console.error("Failed to fetch vehicles:", error.message);
+        return [];
       }
       return data ?? [];
     }
