@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import {
   fetchVehicles,
@@ -12,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
 import { useState } from "react";
 
-const DEFAULT_PRICE_RANGE = [50000, 2000000];
+const DEFAULT_PRICE_RANGE: [number, number] = [50000, 2000000];
 
 export default function Vehicles() {
   const [filters, setFilters] = useState({
@@ -25,9 +24,9 @@ export default function Vehicles() {
   const [sort, setSort] = useState("price-asc");
 
   // Fetch dynamic filters
-  const brandsQuery = useQuery({ queryKey: ["vehicle-brands"], queryFn: fetchVehicleBrands });
-  const fuelQuery = useQuery({ queryKey: ["vehicle-fuels"], queryFn: fetchVehicleFuelTypes });
-  const transQuery = useQuery({ queryKey: ["vehicle-transmissions"], queryFn: fetchVehicleTransmissions });
+  const brandsQuery = useQuery<string[]>({ queryKey: ["vehicle-brands"], queryFn: fetchVehicleBrands });
+  const fuelQuery = useQuery<string[]>({ queryKey: ["vehicle-fuels"], queryFn: fetchVehicleFuelTypes });
+  const transQuery = useQuery<string[]>({ queryKey: ["vehicle-transmissions"], queryFn: fetchVehicleTransmissions });
 
   // Main fetch
   const vehiclesQuery = useQuery({
@@ -64,13 +63,13 @@ export default function Vehicles() {
           {/* Sidebar */}
           <aside className="md:w-64 mb-4 shrink-0">
             <FilterPanel
-              brands={brandsQuery.data}
+              brands={brandsQuery.data ?? []}
               filters={filters}
               onChange={setFilters}
               minPrice={DEFAULT_PRICE_RANGE[0]}
               maxPrice={DEFAULT_PRICE_RANGE[1]}
-              fuelTypes={fuelQuery.data}
-              transmissionTypes={transQuery.data}
+              fuelTypes={fuelQuery.data ?? []}
+              transmissionTypes={transQuery.data ?? []}
             />
           </aside>
           {/* Main content */}

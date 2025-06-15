@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import {
   fetchAccessories,
@@ -11,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
 import { useState } from "react";
 
-const DEFAULT_PRICE_RANGE = [500, 20000];
+const DEFAULT_PRICE_RANGE: [number, number] = [500, 20000];
 
 export default function Accessories() {
   const [filters, setFilters] = useState({
@@ -22,8 +21,8 @@ export default function Accessories() {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("price-asc");
 
-  const brandsQuery = useQuery({ queryKey: ["accessory-brands"], queryFn: fetchAccessoryBrands });
-  const catQuery = useQuery({ queryKey: ["accessory-categories"], queryFn: fetchAccessoryCategories });
+  const brandsQuery = useQuery<string[]>({ queryKey: ["accessory-brands"], queryFn: fetchAccessoryBrands });
+  const catQuery = useQuery<string[]>({ queryKey: ["accessory-categories"], queryFn: fetchAccessoryCategories });
 
   const accessoriesQuery = useQuery({
     queryKey: [
@@ -58,8 +57,8 @@ export default function Accessories() {
           {/* Sidebar */}
           <aside className="md:w-64 mb-4 shrink-0">
             <FilterPanel
-              brands={brandsQuery.data}
-              categories={catQuery.data}
+              brands={brandsQuery.data ?? []}
+              categories={catQuery.data ?? []}
               filters={filters}
               onChange={setFilters}
               minPrice={DEFAULT_PRICE_RANGE[0]}
