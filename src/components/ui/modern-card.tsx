@@ -1,6 +1,6 @@
 
 import { motion } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 
 export function ModernCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
@@ -9,7 +9,7 @@ export function ModernCard({ children, className = "" }: { children: React.React
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className={`card ${className}`}
+      className={`rounded-2xl border p-4 bg-card text-foreground transition-shadow hover:shadow-lg ${className}`}
     >
       {children}
     </motion.div>

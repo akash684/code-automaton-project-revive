@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,9 @@ type Accessory = {
 
 export function AccessoryCard({ accessory }: { accessory: Accessory }) {
   return (
-    <Card className="overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 hover:scale-[1.02] transition-all duration-200 bg-white">
+    <Card
+      className="rounded-2xl border p-4 transition-shadow bg-card text-foreground hover:shadow-lg"
+    >
       <div className="relative w-full h-48 overflow-hidden">
         <img
           src={accessory.image_url || "/placeholder.svg"}
@@ -25,22 +26,26 @@ export function AccessoryCard({ accessory }: { accessory: Accessory }) {
           className="w-full h-full object-cover"
           loading="lazy"
         />
-        <Badge className={`absolute top-3 left-3 capitalize ${accessory.available ? "bg-green-500" : "bg-gray-400"} text-white`}>
+        <Badge
+          className={`absolute top-3 left-3 capitalize ${
+            accessory.available ? "bg-success text-background" : "bg-muted text-foreground"
+          }`}
+        >
           {accessory.available ? "In Stock" : "Out of Stock"}
         </Badge>
-        <Badge className="absolute top-3 right-3 bg-blue-700 text-white">{accessory.category}</Badge>
+        <Badge className="absolute top-3 right-3 bg-accent text-background">{accessory.category}</Badge>
       </div>
       <CardContent className="p-5">
         <div className="mb-1 font-heading text-lg">{accessory.name}</div>
-        <div className="flex flex-wrap gap-2 text-sm text-gray-600 mb-2">
+        <div className="flex flex-wrap gap-2 text-sm text-muted mb-2">
           {accessory.compatible_vehicle_types.map((t) => (
-            <Badge variant="outline" key={t}>{t}</Badge>
+            <Badge variant="outline" key={t} className="bg-background/60 text-foreground">{t}</Badge>
           ))}
         </div>
-        <div className="text-2xl font-bold text-blue-700 mb-3">
+        <div className="text-2xl font-bold text-accent mb-3">
           ₹{new Intl.NumberFormat("en-IN").format(accessory.price)}
         </div>
-        <div className="text-sm text-gray-800 mb-2">Stock: {accessory.stock}</div>
+        <div className="text-sm text-muted mb-2">Stock: {accessory.stock}</div>
         <Button className="w-full" disabled={!accessory.available}>
           {accessory.available ? "Rent / Buy" : "Unavailable"}
         </Button>

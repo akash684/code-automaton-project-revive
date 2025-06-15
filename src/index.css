@@ -1,45 +1,33 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  /* ---- COLOR PALETTE ---- */
   :root {
-    /* Brand Colors */
-    --color-primary: 222 100% 36%;                  /* #0F3D91 - Brand Blue */
-    --color-primary-foreground: 0 0% 100%;          /* White on blue */
+    --background: 0 0% 100%;
+    --card: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+    --muted: 220 14% 65%;
+    --accent: 24 94% 50%;
+    --border: 220 13% 91%;
 
-    --color-secondary: 26 100% 52%;                 /* #FF7F1A - Accent Orange */
-    --color-secondary-foreground: 0 0% 100%;
-
-    --color-success: 142 71% 45%;                   /* green */
-    --color-success-foreground: 0 0% 100%;
+    --color-success: 142 71% 45%;
     --color-warning: 45 100% 50%;
-    --color-warning-foreground: 0 0% 0%;
     --color-error: 0 84.2% 60.2%;
-    --color-error-foreground: 0 0% 100%;
-
-    /* Neutral Grays */
-    --color-muted: 222 12% 92%;                     /* neutral very light BG */
-    --color-muted-foreground: 220 12% 40%;
-
-    --color-background: 0 0% 100%;                  /* default bg: white */
-    --color-foreground: 225 14% 12%;                /* dark text */
-
-    --color-card: 0 0% 100%;                        /* card/modal bg */
-    --color-border: 222 14% 75%;                    /* light border */
-    --color-input: 222 14% 75%;
+    
+    // ... keep any other brand vars the same if present ...
   }
   .dark {
-    --color-background: 222 43% 6%;                 /* #141924 - deep blue */
-    --color-card: 222 39% 12%;                      /* dark card */
-    --color-muted: 222 20% 16%;
-    --color-foreground: 0 0% 100%;
-    --color-primary: 222 100% 64%;                  /* Lighter royal blue for dark */
-    --color-border: 222 16% 26%;
-    --color-input: 222 16% 26%;
-    --color-secondary: 26 100% 54%;                 /* accent orange for dark */
+    --background: 222.2 84% 4.9%;
+    --card: 222.2 64% 7.5%;
+    --foreground: 210 40% 98%;
+    --muted: 215 15% 70%;
+    --accent: 24 94% 62%;
+    --border: 220 17% 30%;
+
+    --color-success: 142 71% 45%;
+    --color-warning: 45 100% 55%;
+    --color-error: 0 84.2% 66.2%;
   }
   * {
     box-sizing: border-box;

@@ -1,4 +1,3 @@
-
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Star, ShoppingCart } from 'lucide-react';
@@ -19,7 +18,7 @@ const AccessoryCard = ({ accessory }: AccessoryCardProps) => {
   };
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 group">
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 group bg-card text-foreground border rounded-2xl">
       <div className="relative overflow-hidden">
         <img
           src={accessory.image}
@@ -27,13 +26,11 @@ const AccessoryCard = ({ accessory }: AccessoryCardProps) => {
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-4 left-4">
-          <Badge variant="secondary" className="bg-white/90">
-            {accessory.category}
-          </Badge>
+          <Badge variant="secondary" className="bg-accent text-background">{accessory.category}</Badge>
         </div>
         {!accessory.inStock && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <Badge variant="destructive">Out of Stock</Badge>
+          <div className="absolute inset-0 bg-background/60 backdrop-blur flex items-center justify-center">
+            <Badge variant="error" className="text-background">Out of Stock</Badge>
           </div>
         )}
       </div>
@@ -54,17 +51,17 @@ const AccessoryCard = ({ accessory }: AccessoryCardProps) => {
         <h3 className="font-semibold text-lg mb-2 line-clamp-2">{accessory.title}</h3>
         
         {accessory.description && (
-          <p className="text-gray-600 text-sm mb-4 line-clamp-2">{accessory.description}</p>
+          <p className="text-muted text-sm mb-4 line-clamp-2">{accessory.description}</p>
         )}
         
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-bold text-blue-600">
+          <div className="text-2xl font-bold text-accent">
             {formatPrice(accessory.price)}
           </div>
           <Button 
             size="sm" 
             disabled={!accessory.inStock}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            className="bg-accent text-background hover:bg-accent/90"
           >
             <ShoppingCart className="w-4 h-4 mr-2" />
             Add to Cart

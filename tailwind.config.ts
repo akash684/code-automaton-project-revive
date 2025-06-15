@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -17,7 +16,16 @@ export default {
     },
     extend: {
       colors: {
-        // 1. Brand Colors (Name the essentials)
+        border:     'hsl(var(--border))',
+        background: 'hsl(var(--background))',
+        card:       'hsl(var(--card))',
+        foreground: 'hsl(var(--foreground))',
+        muted:      'hsl(var(--muted))',
+        accent:     'hsl(var(--accent))',
+        // Status
+        success:  { DEFAULT: "hsl(var(--color-success))" },
+        warning:  { DEFAULT: "hsl(var(--color-warning))" },
+        error:    { DEFAULT: "hsl(var(--color-error))" },
         primary: {
           DEFAULT: "hsl(var(--color-primary))", // Royal Blue
           foreground: "hsl(var(--color-primary-foreground))",
@@ -26,27 +34,10 @@ export default {
           DEFAULT: "hsl(var(--color-secondary))", // Sunset Orange
           foreground: "hsl(var(--color-secondary-foreground))",
         },
-        success: {
-          DEFAULT: "hsl(var(--color-success))",
-          foreground: "hsl(var(--color-success-foreground))"
-        },
-        warning: {
-          DEFAULT: "hsl(var(--color-warning))",
-          foreground: "hsl(var(--color-warning-foreground))"
-        },
-        error: {
-          DEFAULT: "hsl(var(--color-error))",
-          foreground: "hsl(var(--color-error-foreground))"
-        },
         muted: {
           DEFAULT: "hsl(var(--color-muted))",
           foreground: "hsl(var(--color-muted-foreground))"
         },
-        background: "hsl(var(--color-background))",
-        foreground: "hsl(var(--color-foreground))",
-        card: "hsl(var(--color-card))",
-        border: "hsl(var(--color-border))",
-        input: "hsl(var(--color-input))",
         // Old fallback (remove discrete uses)
         "bg-secondary": "#F5F5F5",
         "text-dark": "#1C1C1C",

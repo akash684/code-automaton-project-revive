@@ -1,4 +1,3 @@
-
 import { Heart, MapPin, Fuel, Calendar, Settings } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,7 +18,7 @@ const VehicleCard = ({ vehicle }: VehicleCardProps) => {
   };
 
   return (
-    <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-white border-0 shadow-lg">
+    <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-card text-foreground border rounded-2xl">
       <div className="relative">
         <img
           src={vehicle.image}
@@ -37,15 +36,15 @@ const VehicleCard = ({ vehicle }: VehicleCardProps) => {
       </div>
       
       <CardContent className="p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+        <h3 className="text-xl font-bold mb-2 group-hover:text-accent transition-colors">
           {vehicle.title}
         </h3>
         
-        <div className="text-2xl font-bold text-green-600 mb-4">
+        <div className="text-2xl font-bold text-accent mb-4">
           {formatPrice(vehicle.price)}
         </div>
 
-        <div className="grid grid-cols-2 gap-3 mb-4 text-sm text-gray-600">
+        <div className="grid grid-cols-2 gap-3 mb-4 text-sm text-muted">
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4" />
             <span>{vehicle.year}</span>
@@ -65,7 +64,7 @@ const VehicleCard = ({ vehicle }: VehicleCardProps) => {
         </div>
 
         <div className="flex gap-2">
-          <Button className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+          <Button className="flex-1 bg-accent text-background hover:bg-accent/90">
             View Details
           </Button>
           <Button variant="outline" size="sm">
