@@ -1,8 +1,9 @@
 
-import { render, screen, fireEvent } from '@testing-library/react'; // Fixed imports
+import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import { WishlistItemCard, getDetailPath } from '@/components/WishlistItemCard';
+import type { WishlistItem } from '@/types';
 
 // Test vehicle details navigation
 describe('WishlistItemCard', () => {
@@ -13,7 +14,7 @@ describe('WishlistItemCard', () => {
       return { ...actual, useNavigate: () => mockNavigate };
     });
 
-    const mockVehicle: import('@/types').WishlistItem = {
+    const mockVehicle: WishlistItem = {
       id: "uuid-1",
       user_id: "user-1",
       item_type: "vehicle",
@@ -39,7 +40,7 @@ describe('WishlistItemCard', () => {
   });
 
   it('Displays correct price and image', () => {
-    const mockItem: import('@/types').WishlistItem = {
+    const mockItem: WishlistItem = {
       id: "id2",
       user_id: "user-2",
       item_type: "product",
@@ -61,5 +62,28 @@ describe('WishlistItemCard', () => {
     expect(screen.getByText("₹12,345")).toBeInTheDocument();
     expect(screen.getByAltText("Fancy")).toHaveAttribute("src", "/some.jpg");
   });
-});
 
+  it('Renders fallback image and price correctly', () => {
+    const mockItem: WishlistItem = {
+      id: "id3",
+      user_id: "user-3",
+      item_type: "accessory",
+      item_uuid: "acc-1",
+      product_id: 7,
+      created_at: new Date().toISOString(),
+      product: {
+        name: "Lamp",
+        price: undefined as any,
+        image_url: "",
+        in_stock: true,
+      },
+    };
+    render(
+      <BrowserRouter>
+        <WishlistItemCard item={mockItem} view="list" />
+      </BrowserRouter>
+    );
+    expect(screen.getByText("--")).toBeInTheDocument();
+    expect(screen.getByAltText("Lamp")).toHaveAttribute("src", "/placeholder.png");
+  });
+});

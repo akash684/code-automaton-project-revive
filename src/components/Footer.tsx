@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => (
-  <footer className="w-full border-t border-border bg-background text-muted px-6 py-6 mt-20">
+  <footer className="w-full border-t border-border bg-background text-muted px-6 py-6 mt-20 dark:bg-gray-950/95 dark:text-slate-300 transition-colors">
     <div className="container flex flex-col md:flex-row gap-2 md:justify-between items-center text-sm">
       <span>© {new Date().getFullYear()} AutoMart</span>
       <span>

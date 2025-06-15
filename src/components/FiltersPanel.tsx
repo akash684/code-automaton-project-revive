@@ -71,12 +71,12 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({ filters, onFiltersChange })
     <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
       {/* Vehicle Type */}
       <div>
-        <label className="text-sm font-medium text-gray-700 mb-2 block">Vehicle Type</label>
+        <label className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2 block">Vehicle Type</label>
         <Select value={filters.category || 'all'} onValueChange={handleVehicleTypeChange}>
-          <SelectTrigger>
+          <SelectTrigger className="dark:bg-gray-900 dark:text-slate-200 dark:border-slate-800">
             <SelectValue placeholder="All Types" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="dark:bg-[#0c1b3c] dark:text-slate-200">
             <SelectItem value="all">All Types</SelectItem>
             <SelectItem value="car">Cars</SelectItem>
             <SelectItem value="bike">Bikes</SelectItem>
@@ -86,7 +86,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({ filters, onFiltersChange })
 
       {/* Price Range */}
       <div>
-        <label className="text-sm font-medium text-gray-700 mb-2 block">Price Range</label>
+        <label className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2 block">Price Range</label>
         <div className="px-2">
           <Slider
             value={filters.priceRange}
@@ -96,7 +96,7 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({ filters, onFiltersChange })
             step={50000}
             className="mb-2"
           />
-          <div className="flex justify-between text-xs text-gray-500">
+          <div className="flex justify-between text-xs text-gray-500 dark:text-slate-400">
             <span>{formatPrice(filters.priceRange[0])}</span>
             <span>{formatPrice(filters.priceRange[1])}</span>
           </div>
@@ -105,12 +105,12 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({ filters, onFiltersChange })
 
       {/* Fuel Type */}
       <div>
-        <label className="text-sm font-medium text-gray-700 mb-2 block">Fuel Type</label>
+        <label className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2 block">Fuel Type</label>
         <Select value={filters.fuel || 'all'} onValueChange={handleFuelTypeChange}>
-          <SelectTrigger>
+          <SelectTrigger className="dark:bg-gray-900 dark:text-slate-200 dark:border-slate-800">
             <SelectValue placeholder="All Fuels" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="dark:bg-[#0c1b3c] dark:text-slate-200">
             <SelectItem value="all">All Fuels</SelectItem>
             <SelectItem value="petrol">Petrol</SelectItem>
             <SelectItem value="diesel">Diesel</SelectItem>
@@ -122,12 +122,12 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({ filters, onFiltersChange })
 
       {/* Transmission */}
       <div>
-        <label className="text-sm font-medium text-gray-700 mb-2 block">Transmission</label>
+        <label className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-2 block">Transmission</label>
         <Select value={filters.transmission || 'all'} onValueChange={handleTransmissionChange}>
-          <SelectTrigger>
+          <SelectTrigger className="dark:bg-gray-900 dark:text-slate-200 dark:border-slate-800">
             <SelectValue placeholder="All Types" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="dark:bg-[#0c1b3c] dark:text-slate-200">
             <SelectItem value="all">All Types</SelectItem>
             <SelectItem value="manual">Manual</SelectItem>
             <SelectItem value="automatic">Automatic</SelectItem>
@@ -137,14 +137,14 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({ filters, onFiltersChange })
 
       {/* Actions */}
       <div className="flex flex-col justify-end">
-        <Button variant="outline" onClick={clearFilters} className="w-full">
+        <Button variant="outline" onClick={clearFilters} className="w-full dark:bg-gray-900 dark:text-slate-200 dark:border-slate-800">
           Clear Filters
         </Button>
       </div>
 
       {/* Brands */}
       <div className="md:col-span-2 lg:col-span-5">
-        <label className="text-sm font-medium text-gray-700 mb-3 block">Brands</label>
+        <label className="text-sm font-medium text-gray-700 dark:text-slate-300 mb-3 block">Brands</label>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
           {brands.map((brand) => (
             <div key={brand} className="flex items-center space-x-2">
@@ -152,10 +152,11 @@ const FiltersPanel: React.FC<FiltersPanelProps> = ({ filters, onFiltersChange })
                 id={brand}
                 checked={selectedBrands.includes(brand)}
                 onCheckedChange={(checked) => handleBrandChange(brand, checked as boolean)}
+                className="dark:bg-gray-900 dark:border-slate-800"
               />
               <label
                 htmlFor={brand}
-                className="text-sm text-gray-700 cursor-pointer"
+                className="text-sm text-gray-700 dark:text-slate-200 cursor-pointer"
               >
                 {brand}
               </label>

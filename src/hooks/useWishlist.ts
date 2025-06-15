@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { WishlistItem as WishlistItemType } from "@/types";
@@ -46,7 +45,7 @@ export const useWishlist = () => {
         return;
       }
 
-      // Join all possible product types
+      // Correct join/aliases for WishlistItem unification
       const { data, error } = await supabase
         .from("wishlist")
         .select(`
@@ -59,11 +58,10 @@ export const useWishlist = () => {
 
       if (error) throw error;
 
-      // Normalize to unified WishlistItemType
       const mapped: WishlistItemType[] = await Promise.all(
         (data || []).map(async (row: any) => {
-          let type: ItemType = row.item_type;
-          let baseProduct = null;
+          let type: "product" | "vehicle" | "accessory" = row.item_type;
+          let baseProduct: WishlistItemType["product"] = null;
           if (type === "product" && row.products) {
             baseProduct = {
               name: row.products.name,
@@ -89,21 +87,21 @@ export const useWishlist = () => {
               ...row.accessories,
             };
           } else {
-            // Fallback fetch based on type and ID
+            // fallback
             baseProduct = await fetchProductFallback(
               type,
               type === "product" ? Number(row.product_id) : String(row.item_uuid)
             );
           }
           return {
-            id: row.id,
-            user_id: row.user_id,
+            id: String(row.id),
+            user_id: String(row.user_id),
             item_type: type,
-            item_uuid: row.item_uuid,
+            item_uuid: String(row.item_uuid),
             product_id: Number(row.product_id),
             created_at: row.created_at,
             product: baseProduct,
-          } as WishlistItemType;
+          };
         })
       );
       setWishlistItems(mapped);
@@ -115,11 +113,9 @@ export const useWishlist = () => {
     }
   };
 
-  /**
-   * Add any item type to wishlist
-   */
+  // Fix addToWishlist/removeFromWishlist types, allow string/number, cast when needed:
   const addToWishlist = async (itemId: number | string) => {
-    const itemType: ItemType =
+    const itemType: "product" | "vehicle" | "accessory" =
       typeof itemId === 'number'
         ? "product"
         : typeof itemId === 'string' && itemId.length === 36
@@ -135,6 +131,7 @@ export const useWishlist = () => {
         toast.info('Item already in wishlist');
         return false;
       }
+      // For Partial<WishlistItem> & {user_id}, casting is now correct
       const insertData: Partial<WishlistItemType> & { user_id?: string } = {
         user_id: user.id,
         item_type: itemType,
@@ -163,11 +160,8 @@ export const useWishlist = () => {
     }
   };
 
-  /**
-   * Remove from wishlist
-   */
   const removeFromWishlist = async (itemId: number | string) => {
-    const itemType: ItemType =
+    const itemType: "product" | "vehicle" | "accessory" =
       typeof itemId === 'number'
         ? "product"
         : typeof itemId === 'string' && itemId.length === 36
@@ -200,9 +194,8 @@ export const useWishlist = () => {
     }
   };
 
-  /** Checks if an item is already in wishlist */
   const isInWishlist = (itemId: number | string) => {
-    const itemType: ItemType =
+    const itemType: "product" | "vehicle" | "accessory" =
       typeof itemId === 'number'
         ? "product"
         : typeof itemId === 'string' && itemId.length === 36
