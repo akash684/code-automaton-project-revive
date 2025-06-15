@@ -22,7 +22,17 @@ import { toast } from "sonner";
 import { useWishlist } from '@/hooks/useWishlist';
 import { Heart } from "lucide-react";
 
-const DEFAULT_PRICE_RANGE: [number, number] = [500, 2000000];
+type Product = {
+  id: string | number;
+  category: "car" | "bike" | "accessory";
+  model: string;
+  brand: string;
+  price: number;
+  image_url: string | null;
+  available: boolean;
+  fuel?: string;
+  transmission?: string;
+};
 
 export default function Vehicles() {
   const [filters, setFilters] = useState({
@@ -48,22 +58,25 @@ export default function Vehicles() {
     queryKey: ["vehicles", filters, search, sort],
     queryFn: async () => {
       const { supabase } = await import("@/integrations/supabase/client");
-      let query = supabase.from("products").select("*");
+      // Normalize filters
+      const catFilter = filters.category === "all" ? null : filters.category.toLowerCase().trim();
+      const brandFilter = filters.brand === "all" ? null : filters.brand.toLowerCase().trim();
+      const fuelFilter = filters.fuel === "all" ? null : filters.fuel.toLowerCase().trim();
+      const transFilter = filters.transmission === "all" ? null : filters.transmission.toLowerCase().trim();
 
-      // If a category filter is set (car or bike)
-      if (filters.category !== "all") {
-        query = query.eq("category", filters.category);
+      let query = supabase.from<Product>("products").select("*");
+
+      if (catFilter) {
+        query = query.eq("category", catFilter);
       } else {
-        // Show only cars or bikes, never accessories
-        query = query.in("category", ["car", "bike"]);
+        query = query.in("category", ["car", "bike"]); // Always filter for car/bike if no specific filter
       }
-
       if (search) query = query.ilike("model", `%${search}%`);
       if (sort === "price-asc") query = query.order("price", { ascending: true });
       else if (sort === "price-desc") query = query.order("price", { ascending: false });
-      if (filters.brand !== "all") query = query.eq("brand", filters.brand);
-      if (filters.fuel !== "all") query = query.eq("fuel", filters.fuel);
-      if (filters.transmission !== "all") query = query.eq("transmission", filters.transmission);
+      if (brandFilter) query = query.eq("brand", brandFilter);
+      if (fuelFilter) query = query.eq("fuel", fuelFilter);
+      if (transFilter) query = query.eq("transmission", transFilter);
 
       if (
         filters.priceRange &&
@@ -73,10 +86,17 @@ export default function Vehicles() {
           .gte("price", filters.priceRange[0])
           .lte("price", filters.priceRange[1]);
       }
+
       const { data, error } = await query;
+      console.table(data); // TEMP: To help you verify fetched cars/bikes
+
       if (error) {
         console.error("Failed to fetch vehicles:", error.message);
         return [];
+      }
+      if (!data || data.length === 0) {
+        // Notify user something is still wrong
+        toast.info("No cars or bikes found. Check filters or Supabase policy.");
       }
       return data ?? [];
     }
