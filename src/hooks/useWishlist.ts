@@ -40,7 +40,18 @@ export const useWishlist = () => {
         .eq('user_id', user.id);
 
       if (error) throw error;
-      setWishlistItems(data || []);
+
+      // Make sure every row conforms to WishlistItem, especially item_type
+      const mapped = (data || []).map((row) => ({
+        ...row,
+        // explicitly cast item_type to avoid TS errors
+        item_type: (row.item_type === "vehicle" || row.item_type === "accessory" || row.item_type === "product")
+          ? row.item_type
+          : "product",
+        product: row.product ?? null,
+      })) as WishlistItem[];
+
+      setWishlistItems(mapped);
     } catch (error) {
       console.error('Error fetching wishlist:', error);
       toast.error('Failed to load wishlist items');
