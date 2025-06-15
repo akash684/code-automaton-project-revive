@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Product } from '@/types';
@@ -193,6 +192,43 @@ const Index = () => {
               </Card>
             ))}
           </div>
+
+          {/* --- New content: Description & Info Bar --- */}
+          <div className="rounded-xl mt-10 p-6 bg-gradient-to-r from-blue-900/60 to-purple-700/40 backdrop-blur-lg shadow-lg flex flex-col md:flex-row items-center md:justify-between gap-6">
+            <p className="text-lg font-medium max-w-xl">
+              Discover the most popular cars chosen by our customers. All vehicles are thoroughly inspected and available for rent or purchase with transparent pricing.
+            </p>
+            <div className="flex flex-row flex-wrap gap-6 items-center justify-end mt-4 md:mt-0">
+              <div className="flex flex-col items-center">
+                <span className="text-2xl font-bold text-blue-300">1500+</span>
+                <span className="text-xs text-slate-300">Cars Available</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="text-2xl font-bold text-green-300">750K</span>
+                <span className="text-xs text-slate-300">Happy Customers</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="text-2xl font-bold text-purple-300">200+</span>
+                <span className="text-xs text-slate-300">Verified Dealers</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* --- Popular Vehicle Brands Section --- */}
+        <section className="py-10">
+          <h3 className="text-2xl font-bold mb-6 drop-shadow text-center">Popular Vehicle Brands</h3>
+          <div className="flex flex-wrap justify-center gap-4 mb-4">
+            {["Maruti", "Tata", "Hyundai", "Toyota", "Honda", "Kia", "Suzuki", "Royal Enfield", "Yamaha", "Bajaj"].map((brand) => (
+              <div
+                key={brand}
+                className="bg-white/10 backdrop-blur-sm text-white px-5 py-2 rounded-full shadow border border-white/10 text-base font-semibold hover:scale-105 transition"
+              >
+                {brand}
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-slate-200 max-w-2xl mx-auto">We partner with leading car and bike manufacturers to bring you the widest range of vehicles. Filter by your favorite brand to find your dream ride!</p>
         </section>
 
         {/* Featured Bikes */}
@@ -242,6 +278,13 @@ const Index = () => {
                 </CardContent>
               </Card>
             ))}
+          </div>
+
+          {/* --- New content: Description --- */}
+          <div className="rounded-xl mt-10 p-6 bg-gradient-to-r from-purple-900/60 to-blue-700/40 backdrop-blur-lg shadow-lg flex items-center">
+            <p className="text-lg font-medium text-center w-full">
+              From speed lovers to everyday commuters, our featured bikes collection has something for everyone. Explore, compare, and book your perfect ride today.
+            </p>
           </div>
         </section>
 
