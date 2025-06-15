@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Product } from '@/types';
@@ -8,6 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { Heart, ShoppingCart, Star, ArrowRight, Truck, Shield, Clock, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import { BrandDisplayText } from "@/components/BrandDisplayText";
+import { BrandButton } from "@/components/BrandButton";
+import { HomeHeroBg } from "@/components/HomeHeroBg";
 
 const Index = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
@@ -59,56 +61,18 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white">
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1920&h=1080&fit=crop"
-            alt="Luxury vehicles"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-black/50"></div>
+      <HomeHeroBg>
+        <BrandDisplayText>
+          AI-Powered Vehicle Recommendations
+        </BrandDisplayText>
+        <p className="text-lg md:text-2xl text-balance mt-6 mb-6 text-gray-100 font-body">
+          Let our smart assistant help you find the ideal vehicle for Indian roads and your&nbsp;budget
+        </p>
+        {/* Example button */}
+        <div className="flex justify-center mt-6">
+          <BrandButton className="text-lg px-10 py-3 rounded-2xl bg-accent">Search Vehicles</BrandButton>
         </div>
-
-        {/* Hero Content */}
-        <div className="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-            Your Dream Vehicle 🚗🇮🇳
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 text-gray-200">
-            Premium cars, bikes & accessories delivered to your doorstep
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link to="/vehicles">
-              <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg px-8 py-4">
-                Explore Vehicles <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-            </Link>
-            <Link to="/accessories">
-              <Button size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-black text-lg px-8 py-4">
-                Shop Accessories 🛵
-              </Button>
-            </Link>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-8 mt-16 max-w-2xl mx-auto">
-            <div className="text-center">
-              <div className="text-3xl font-bold">500+</div>
-              <div className="text-gray-300">Vehicles</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold">10K+</div>
-              <div className="text-gray-300">Happy Customers</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold">24/7</div>
-              <div className="text-gray-300">Support</div>
-            </div>
-          </div>
-        </div>
-      </section>
+      </HomeHeroBg>
 
       {/* Why Choose Us */}
       <section className="py-20 px-4">
