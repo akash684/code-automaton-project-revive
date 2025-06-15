@@ -13,6 +13,9 @@ import { HomeHeroBg } from "@/components/HomeHeroBg";
 import { Navbar } from "@/components/ui/navbar";
 import { motion } from "framer-motion";
 
+const heroBg =
+  "/lovable-uploads/4605de8a-f1a2-408b-83a7-6687db4469f0.png"; // Reference image for now. Replace with production asset if needed.
+
 const Index = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -61,26 +64,51 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 dark:from-gray-900 dark:via-gray-950 dark:to-gray-900 transition-colors duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-[#181b20] to-gray-950 text-white transition-colors duration-300">
       <Navbar onToggleDark={() => document.documentElement.classList.toggle('dark')} />
-      {/* Hero Section w/ glass effect */}
+      {/* Hero Section */}
       <motion.section
-        className="relative bg-white/60 dark:bg-gray-950/60 backdrop-blur-lg rounded-2xl shadow-xl container mx-auto mt-10 py-12 px-6 flex flex-col items-center"
+        className="relative flex flex-col md:flex-row items-center min-h-[80vh] container mx-auto"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
       >
-        <BrandDisplayText>
-          AI-Powered Vehicle Recommendations
-        </BrandDisplayText>
-        <p className="text-lg md:text-2xl text-balance mt-6 mb-6 text-gray-700 dark:text-gray-100 font-body">
-          Let our smart assistant help you find the ideal vehicle for Indian roads and your&nbsp;budget
-        </p>
-        <div className="flex justify-center mt-6 gap-3">
-          <BrandButton className="text-lg px-10 py-3 rounded-2xl bg-accent glassmorphism">
-            Search Vehicles
-          </BrandButton>
+        {/* Left: Text + CTA */}
+        <div className="md:w-1/2 w-full z-20 flex flex-col items-start justify-center py-20 md:py-0 px-2 md:px-0">
+          <div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-3">
+              Powerful, Fun and <br />
+              <span className="block font-black text-5xl md:text-6xl text-red-500 tracking-tighter mt-2 mb-2">
+                FIERCE TO <span className="text-white">DRIVE</span>
+              </span>
+            </h1>
+            <p className="text-base md:text-lg text-slate-200 mb-7 mt-2 font-medium drop-shadow">
+              Real Poise, Real Power, Real Performance.
+            </p>
+            <Link to="/contact">
+              <Button
+                className="mt-2 bg-red-600 hover:bg-red-700 text-lg px-8 py-4 font-bold shadow-xl rounded-full"
+                size="lg"
+              >
+                Book a Test Ride
+              </Button>
+            </Link>
+          </div>
         </div>
+        {/* Right: Car Image */}
+        <div className="md:w-1/2 w-full flex items-center justify-center relative min-h-[300px]">
+          <div className="relative w-full max-w-[520px] md:max-w-[550px]">
+            <img
+              src={heroBg}
+              alt="Luxury black car, book a test drive"
+              className="relative rounded-3xl w-full shadow-2xl md:shadow-3xl object-cover select-none"
+              style={{ background: "rgba(32,32,32,0.4)" }}
+            />
+            {/* Optional Glass overlay */}
+            <div className="absolute inset-0 rounded-3xl bg-black/40 backdrop-blur-sm pointer-events-none" />
+          </div>
+        </div>
+        {/* (you may want to move hero graphics under a <HomeHeroBg /> if further reusing!) */}
       </motion.section>
 
       {/* Why Choose Us */}
