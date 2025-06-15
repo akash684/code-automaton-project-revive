@@ -4,6 +4,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { WishlistItem } from '@/types';
 import { toast } from 'sonner';
 
+function isIntegerId(id: any): id is number {
+  return typeof id === 'number' && Number.isInteger(id);
+}
+
 export const useWishlist = () => {
   const [wishlistItems, setWishlistItems] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,7 +42,14 @@ export const useWishlist = () => {
     }
   };
 
-  const addToWishlist = async (productId: number) => {
+  const addToWishlist = async (itemId: number | string) => {
+    // Only allow adding integer (legacy 'product') ids, for now
+    if (!isIntegerId(itemId)) {
+      toast.info(
+        'Favoriting is currently only supported for products. Accessories and vehicles cannot be added to wishlist yet.'
+      );
+      return false;
+    }
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -47,7 +58,7 @@ export const useWishlist = () => {
       }
 
       // Check if item already exists in wishlist
-      const existingItem = wishlistItems.find(item => item.product_id === productId);
+      const existingItem = wishlistItems.find(item => item.product_id === itemId);
       if (existingItem) {
         toast.info('Item already in wishlist');
         return false;
@@ -57,7 +68,7 @@ export const useWishlist = () => {
         .from('wishlist')
         .insert({
           user_id: user.id,
-          product_id: productId
+          product_id: itemId
         });
 
       if (error) throw error;
@@ -71,7 +82,14 @@ export const useWishlist = () => {
     }
   };
 
-  const removeFromWishlist = async (productId: number) => {
+  const removeFromWishlist = async (itemId: number | string) => {
+    // Only allow removing integer (product) items for now
+    if (!isIntegerId(itemId)) {
+      toast.info(
+        'Wishlist removal is not supported for this type of item yet.'
+      );
+      return false;
+    }
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return false;
@@ -80,7 +98,7 @@ export const useWishlist = () => {
         .from('wishlist')
         .delete()
         .eq('user_id', user.id)
-        .eq('product_id', productId);
+        .eq('product_id', itemId);
 
       if (error) throw error;
       await fetchWishlistItems();
@@ -93,8 +111,10 @@ export const useWishlist = () => {
     }
   };
 
-  const isInWishlist = (productId: number) => {
-    return wishlistItems.some(item => item.product_id === productId);
+  const isInWishlist = (itemId: number | string) => {
+    // Only check for legacy integer ids
+    if (!isIntegerId(itemId)) return false;
+    return wishlistItems.some(item => item.product_id === itemId);
   };
 
   return {
@@ -106,3 +126,4 @@ export const useWishlist = () => {
     refetch: fetchWishlistItems
   };
 };
+
