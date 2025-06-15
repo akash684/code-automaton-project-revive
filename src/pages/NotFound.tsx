@@ -257,25 +257,34 @@ function WishlistCard({
   removing: boolean;
   onRemove: () => void;
 }) {
-  // Gather display data depending on type
-  const isProduct = item.item_type === "product" && item.product;
-  const isVehicle = item.item_type === "vehicle" && item.product == null && !!item.brand;
-  const isAccessory = item.item_type === "accessory" && item.product == null && !!item.name;
-
-  // Unified fields
-  let image = item.product?.image_url || item.image_url || "/placeholder.svg";
+  // Enhanced price extraction: fallback for all types
+  let image =
+    item.product?.image_url ||
+    item.image_url ||
+    item.image ||
+    "/placeholder.svg";
   let title =
     item.product?.name ||
     item.title ||
-    item.brand && item.model ? `${item.brand} ${item.model}` : 
+    (item.brand && item.model
+      ? `${item.brand} ${item.model}`
+      : "") ||
     item.brand ||
     item.name ||
     "Item";
+  
+  // Compute, fallback to any "price" available
   let price =
-    getPrice(item) ||
-    item.price ||
-    item.product?.price_inr ||
-    undefined;
+    typeof item.product?.price === "number"
+      ? item.product.price
+      : typeof item.price === "number"
+      ? item.price
+      : typeof item.product?.price_inr === "number"
+      ? item.product.price_inr
+      : typeof item.price_inr === "number"
+      ? item.price_inr
+      : undefined;
+
   let stock =
     item.product?.in_stock ??
     item.product?.available ??
@@ -286,33 +295,34 @@ function WishlistCard({
     item.category ||
     item.product?.type ||
     item.type ||
-    (item.item_type === "vehicle" ? "Vehicle" : item.item_type === "accessory" ? "Accessory" : "Misc");
-
-  let rating =
-    item.product?.rating ||
-    item.rating ||
-    undefined;
-
-  let brand =
-    item.product?.brand ||
-    item.brand ||
-    undefined;
-
-  // Card Actions link (reuse old logic with fallback)
-  const detailsLink =
-    item.item_type === "product"
-      ? `/products/${item.product?.slug ?? item.product_id}`
-      : item.item_type === "vehicle"
-      ? `/vehicles/${item.item_uuid ?? ""}`
+    (item.item_type === "vehicle"
+      ? "Vehicle"
       : item.item_type === "accessory"
-      ? `/accessories/${item.item_uuid ?? ""}`
+      ? "Accessory"
+      : "Misc");
+  let rating = item.product?.rating || item.rating || undefined;
+  let brand = item.product?.brand || item.brand || undefined;
+
+  // Always valid URLs for details
+  let detailsLink =
+    item.item_type === "product"
+      ? `/products/${item.product?.slug ?? item.product_id ?? item.id ?? ""}`
+      : item.item_type === "vehicle"
+      ? `/vehicles/${item.item_uuid ?? item.id ?? ""}`
+      : item.item_type === "accessory"
+      ? `/accessories/${item.item_uuid ?? item.id ?? ""}`
       : "#";
 
   // Animation variants
   const cardVariants = {
     initial: { opacity: 0, y: 30, scale: 0.97 },
     animate: { opacity: 1, y: 0, scale: 1 },
-    exit: { opacity: 0, y: 60, scale: 0.95, transition: { duration: 0.35 } },
+    exit: {
+      opacity: 0,
+      y: 60,
+      scale: 0.95,
+      transition: { duration: 0.35 },
+    },
   };
 
   // Responsive/variant styles
@@ -343,13 +353,19 @@ function WishlistCard({
   const tags = (
     <div className="flex flex-wrap gap-1 text-xs text-slate-400 mb-1">
       {category && (
-        <span className="bg-slate-700 rounded-full px-2 py-0.5">{category}</span>
+        <span className="bg-slate-700 rounded-full px-2 py-0.5">
+          {category}
+        </span>
       )}
       {brand && (
-        <span className="border border-slate-600 rounded-full px-2 py-0.5">{brand}</span>
+        <span className="border border-slate-600 rounded-full px-2 py-0.5">
+          {brand}
+        </span>
       )}
       {item.product?.type && !item.product?.category && (
-        <span className="bg-slate-700 rounded-full px-2 py-0.5">{item.product?.type}</span>
+        <span className="bg-slate-700 rounded-full px-2 py-0.5">
+          {item.product?.type}
+        </span>
       )}
     </div>
   );
@@ -367,7 +383,11 @@ function WishlistCard({
         <Trash2 className="w-5 h-5" />
       </Button>
       <Link to={detailsLink}>
-        <Button variant="outline" size="sm" className="border-cyan-600 text-cyan-400 hover:bg-cyan-900/30">
+        <Button
+          variant="outline"
+          size="sm"
+          className="border-cyan-600 text-cyan-400 hover:bg-cyan-900/30"
+        >
           <Eye className="w-4 h-4 mr-2" />
           {view === "grid" ? "View Details" : "Details"}
         </Button>
