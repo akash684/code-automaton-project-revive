@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { CardContent } from "@/components/ui/card";
+import { BuyModal } from "@/components/BuyModal";
 
 export default function Accessories() {
   const [filters, setFilters] = useState({
@@ -18,6 +19,8 @@ export default function Accessories() {
   });
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("price-asc");
+  const [buyModalOpen, setBuyModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
 
   // Dynamic filters
   const catQuery = useQuery<string[]>({ queryKey: ["accessory-categories"], queryFn: fetchAccessoryCategories });
@@ -203,12 +206,40 @@ export default function Accessories() {
                         ₹{new Intl.NumberFormat("en-IN").format(accessory.price)}
                       </div>
                       <div className="text-sm text-gray-800 mb-2">Stock: {accessory.stock}</div>
-                      <Button className="w-full" disabled={!accessory.available}>
-                        {accessory.available ? "Rent / Buy" : "Unavailable"}
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          className="flex-1"
+                          variant="outline"
+                          disabled={!accessory.available}
+                          onClick={() => { /* Rent logic here */ toast.success('Rent flow coming soon!'); }}
+                        >
+                          Rent Now
+                        </Button>
+                        <Button
+                          className="flex-1"
+                          disabled={!accessory.available}
+                          onClick={() => {
+                            setSelectedItem({
+                              name: accessory.name,
+                              price: accessory.price,
+                              image_url: accessory.image_url
+                            });
+                            setBuyModalOpen(true);
+                          }}
+                          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                        >
+                          Buy Now
+                        </Button>
+                      </div>
                     </CardContent>
                   </ModernCard>
                 ))}
+                <BuyModal
+                  open={buyModalOpen}
+                  onOpenChange={setBuyModalOpen}
+                  item={selectedItem || { name: "", price: 0 }}
+                  itemType="Accessory"
+                />
               </div>
             ) : (
               <AnimatedEmpty message="No accessories available right now." onReset={handleReset} />

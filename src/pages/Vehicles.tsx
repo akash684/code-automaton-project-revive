@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { CardContent } from "@/components/ui/card";
+import { BuyModal } from "@/components/BuyModal";
 
 const DEFAULT_PRICE_RANGE: [number, number] = [500, 2000000];
 
@@ -30,6 +31,8 @@ export default function Vehicles() {
   });
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("price-asc");
+  const [buyModalOpen, setBuyModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
 
   // Dynamic filter options
   const brandsQuery = useQuery<string[]>({ queryKey: ["vehicle-brands"], queryFn: fetchVehicleBrands });
@@ -244,12 +247,40 @@ export default function Vehicles() {
                       <div className="text-2xl font-bold text-blue-700 mb-3">
                         ₹{new Intl.NumberFormat("en-IN").format(vehicle.price)}
                       </div>
-                      <Button className="w-full" disabled={!vehicle.available}>
-                        {vehicle.available ? "Rent / Buy" : "Unavailable"}
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          className="flex-1"
+                          disabled={!vehicle.available}
+                          variant="outline"
+                          onClick={() => { /* Rent logic here */ toast.success('Rent flow coming soon!'); }}
+                        >
+                          Rent Now
+                        </Button>
+                        <Button
+                          className="flex-1"
+                          disabled={!vehicle.available}
+                          onClick={() => {
+                            setSelectedItem({
+                              name: vehicle.model,
+                              price: vehicle.price,
+                              image_url: vehicle.image_url
+                            });
+                            setBuyModalOpen(true);
+                          }}
+                          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                        >
+                          Buy Now
+                        </Button>
+                      </div>
                     </CardContent>
                   </ModernCard>
                 ))}
+                <BuyModal
+                  open={buyModalOpen}
+                  onOpenChange={setBuyModalOpen}
+                  item={selectedItem || { name: "", price: 0 }}
+                  itemType="Vehicle"
+                />
               </div>
             ) : (
               <AnimatedEmpty message="No vehicles available right now." onReset={handleReset} />
