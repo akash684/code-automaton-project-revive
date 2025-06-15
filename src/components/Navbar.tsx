@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,11 +5,14 @@ import { Car, Menu, X, ShoppingCart, Heart, User, LogOut } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { Badge } from "@/components/ui/badge";
+import { useWishlist } from "@/hooks/useWishlist";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState(null);
   const { getCartCount } = useCart();
+  const { wishlistItems, loading: wishlistLoading } = useWishlist();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -63,9 +65,14 @@ const Navbar = () => {
           </div>
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link to="/wishlist">
+            <Link to="/wishlist" className="relative">
               <Button variant="ghost" size="sm" className="text-blue-300 hover:bg-gray-900">
                 <Heart className="h-5 w-5" />
+                {!wishlistLoading && wishlistItems.length > 0 && (
+                  <Badge variant="error" className="absolute -top-1.5 -right-1.5 select-none">
+                    {wishlistItems.length}
+                  </Badge>
+                )}
               </Button>
             </Link>
             {user ? (
@@ -106,9 +113,14 @@ const Navbar = () => {
               <Link to="/contact" className="block px-3 py-2 hover:text-blue-400" onClick={() => setIsOpen(false)}>Contact</Link>
               <div className="border-t border-gray-700 pt-4 mt-4">
                 <div className="flex gap-2 items-center justify-around">
-                  <Link to="/wishlist">
+                  <Link to="/wishlist" className="relative">
                     <Button variant="ghost" size="sm" className="text-blue-300">
                       <Heart className="h-5 w-5" />
+                      {!wishlistLoading && wishlistItems.length > 0 && (
+                        <Badge variant="error" className="absolute -top-1.5 -right-1.5 select-none">
+                          {wishlistItems.length}
+                        </Badge>
+                      )}
                     </Button>
                   </Link>
                   <Link to="/profile">
