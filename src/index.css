@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,8 +15,6 @@
     --color-success: 142 71% 45%;
     --color-warning: 45 100% 50%;
     --color-error: 0 84.2% 60.2%;
-    
-    // ... keep any other brand vars the same if present ...
   }
   .dark {
     --background: 222.2 84% 4.9%;
@@ -75,3 +74,4 @@ textarea {
 .label {
   @apply font-medium text-muted-foreground mb-0.5;
 }
+
