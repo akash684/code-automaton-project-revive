@@ -28,9 +28,15 @@ export function FilterPanel({
   transmissionTypes,
   withCategory
 }: FilterPanelProps) {
+  // Ensure no empty string options in selects
+  const filteredBrands = (brands || []).filter(Boolean);
+  const filteredCategories = (categories || []).filter(Boolean);
+  const filteredFuelTypes = (fuelTypes || []).filter(Boolean);
+  const filteredTransmissionTypes = (transmissionTypes || []).filter(Boolean);
+
   return (
     <div className="space-y-6 p-4">
-      {withCategory && categories && (
+      {withCategory && filteredCategories && (
         <div>
           <div className="font-medium mb-1">Category</div>
           <Select value={filters.category ?? ""} onValueChange={v => onChange({ ...filters, category: v })}>
@@ -39,12 +45,12 @@ export function FilterPanel({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All</SelectItem>
-              {categories.map(c => (<SelectItem value={c} key={c}>{c}</SelectItem>))}
+              {filteredCategories.map(c => (<SelectItem value={c} key={c}>{c}</SelectItem>))}
             </SelectContent>
           </Select>
         </div>
       )}
-      {brands && (
+      {filteredBrands && (
         <div>
           <div className="font-medium mb-1">Brand</div>
           <Select value={filters.brand ?? ""} onValueChange={v => onChange({ ...filters, brand: v })}>
@@ -53,12 +59,12 @@ export function FilterPanel({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All</SelectItem>
-              {brands.map(b => (<SelectItem value={b} key={b}>{b}</SelectItem>))}
+              {filteredBrands.map(b => (<SelectItem value={b} key={b}>{b}</SelectItem>))}
             </SelectContent>
           </Select>
         </div>
       )}
-      {fuelTypes && (
+      {filteredFuelTypes.length > 0 && (
         <div>
           <div className="font-medium mb-1">Fuel</div>
           <Select value={filters.fuel ?? ""} onValueChange={v => onChange({ ...filters, fuel: v })}>
@@ -67,12 +73,12 @@ export function FilterPanel({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All</SelectItem>
-              {fuelTypes.map(f => (<SelectItem value={f} key={f}>{f}</SelectItem>))}
+              {filteredFuelTypes.map(f => (<SelectItem value={f} key={f}>{f}</SelectItem>))}
             </SelectContent>
           </Select>
         </div>
       )}
-      {transmissionTypes && (
+      {filteredTransmissionTypes.length > 0 && (
         <div>
           <div className="font-medium mb-1">Transmission</div>
           <Select value={filters.transmission ?? ""} onValueChange={v => onChange({ ...filters, transmission: v })}>
@@ -81,7 +87,7 @@ export function FilterPanel({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="">All</SelectItem>
-              {transmissionTypes.map(tr => (<SelectItem value={tr} key={tr}>{tr}</SelectItem>))}
+              {filteredTransmissionTypes.map(tr => (<SelectItem value={tr} key={tr}>{tr}</SelectItem>))}
             </SelectContent>
           </Select>
         </div>
