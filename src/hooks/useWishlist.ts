@@ -4,8 +4,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { WishlistItem } from '@/types';
 import { toast } from 'sonner';
 
-function isIntegerId(id: any): id is number {
-  return typeof id === 'number' && Number.isInteger(id);
+type ItemType = 'product' | 'vehicle' | 'accessory';
+
+function detectItemType(itemId: number | string): ItemType {
+  if (typeof itemId === 'number' && Number.isInteger(itemId)) return 'product';
+  if (typeof itemId === 'string') {
+    // IDs from vehicles/accessories are UUIDv4 strings (36 chars)
+    return 'vehicle';
+  }
+  return 'accessory';
 }
 
 export const useWishlist = () => {
@@ -42,34 +49,39 @@ export const useWishlist = () => {
     }
   };
 
+  /**
+   * Add any item type to wishlist (product: int, vehicle/accessory: uuid)
+   */
   const addToWishlist = async (itemId: number | string) => {
-    // Only allow adding integer (legacy 'product') ids, for now
-    if (!isIntegerId(itemId)) {
-      toast.info(
-        'Favoriting is currently only supported for products. Accessories and vehicles cannot be added to wishlist yet.'
-      );
-      return false;
-    }
+    const itemType: ItemType = detectItemType(itemId);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         toast.error('Please sign in to add items to wishlist');
         return false;
       }
-
-      // Check if item already exists in wishlist
-      const existingItem = wishlistItems.find(item => item.product_id === itemId);
-      if (existingItem) {
+      // Prevent duplicate
+      if (isInWishlist(itemId)) {
         toast.info('Item already in wishlist');
+        return false;
+      }
+
+      const insertData: any = {
+        user_id: user.id,
+        item_type: itemType,
+      };
+      if (itemType === 'product' && typeof itemId === 'number') {
+        insertData.product_id = itemId;
+      } else if ((itemType === 'vehicle' || itemType === 'accessory') && typeof itemId === 'string') {
+        insertData.item_uuid = itemId;
+      } else {
+        toast.error('Invalid item type or ID');
         return false;
       }
 
       const { error } = await supabase
         .from('wishlist')
-        .insert({
-          user_id: user.id,
-          product_id: itemId
-        });
+        .insert(insertData);
 
       if (error) throw error;
       await fetchWishlistItems();
@@ -82,23 +94,26 @@ export const useWishlist = () => {
     }
   };
 
+  /**
+   * Remove any item type from wishlist
+   */
   const removeFromWishlist = async (itemId: number | string) => {
-    // Only allow removing integer (product) items for now
-    if (!isIntegerId(itemId)) {
-      toast.info(
-        'Wishlist removal is not supported for this type of item yet.'
-      );
-      return false;
-    }
+    const itemType: ItemType = detectItemType(itemId);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return false;
 
-      const { error } = await supabase
-        .from('wishlist')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('product_id', itemId);
+      let query = supabase.from('wishlist').delete().eq('user_id', user.id).eq('item_type', itemType);
+      if (itemType === 'product' && typeof itemId === 'number') {
+        query = query.eq('product_id', itemId);
+      } else if ((itemType === 'vehicle' || itemType === 'accessory') && typeof itemId === 'string') {
+        query = query.eq('item_uuid', itemId);
+      } else {
+        toast.error('Invalid item type or ID');
+        return false;
+      }
+
+      const { error } = await query;
 
       if (error) throw error;
       await fetchWishlistItems();
@@ -111,10 +126,16 @@ export const useWishlist = () => {
     }
   };
 
+  /** Checks if an item is already in wishlist */
   const isInWishlist = (itemId: number | string) => {
-    // Only check for legacy integer ids
-    if (!isIntegerId(itemId)) return false;
-    return wishlistItems.some(item => item.product_id === itemId);
+    const itemType: ItemType = detectItemType(itemId);
+    if (itemType === 'product' && typeof itemId === 'number') {
+      return wishlistItems.some(item => item.product_id === itemId && item.item_type === 'product');
+    }
+    if ((itemType === 'vehicle' || itemType === 'accessory') && typeof itemId === 'string') {
+      return wishlistItems.some(item => item.item_uuid === itemId && item.item_type === itemType);
+    }
+    return false;
   };
 
   return {
@@ -126,4 +147,3 @@ export const useWishlist = () => {
     refetch: fetchWishlistItems
   };
 };
-

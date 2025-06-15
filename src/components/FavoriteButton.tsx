@@ -1,10 +1,11 @@
+
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWishlist } from "@/hooks/useWishlist";
 import { cn } from "@/lib/utils";
 
 type FavoriteButtonProps = {
-  itemId: number;
+  itemId: number | string;
   size?: "sm" | "icon" | "default";
   className?: string;
   showText?: boolean;
@@ -22,15 +23,8 @@ export function FavoriteButton({
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const wishlisted = isInWishlist(itemId);
 
-  const isLegacyProduct = typeof itemId === "number" && Number.isInteger(itemId);
-
   const handleClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!isLegacyProduct) {
-      // Provide feedback to user and do nothing
-      addToWishlist(itemId); // triggers toast/info
-      return;
-    }
     if (wishlisted) {
       await removeFromWishlist(itemId);
     } else {
@@ -52,7 +46,6 @@ export function FavoriteButton({
           : "bg-gray-900 border-gray-700 text-gray-300 hover:bg-gray-800",
         className
       )}
-      disabled={disableUnauth && !isLegacyProduct}
       type="button"
     >
       <Heart
