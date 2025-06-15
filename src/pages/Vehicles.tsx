@@ -16,6 +16,7 @@ import { AnimatedEmpty } from "@/components/ui/animated-empty";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { CardContent } from "@/components/ui/card";
 
 const DEFAULT_PRICE_RANGE: [number, number] = [500, 2000000];
 

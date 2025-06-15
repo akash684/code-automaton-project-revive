@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { fetchAccessories, fetchAccessoryCategories } from "@/services/supabase/products";
 import { Input } from "@/components/ui/input";
@@ -9,6 +8,7 @@ import { AnimatedEmpty } from "@/components/ui/animated-empty";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { CardContent } from "@/components/ui/card";
 
 export default function Accessories() {
   const [filters, setFilters] = useState({
