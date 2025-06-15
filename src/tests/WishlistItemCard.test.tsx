@@ -1,59 +1,64 @@
 
-import { render, screen, fireEvent } from "@testing-library/react";
-import { WishlistItemCard, getDetailPath } from "@/components/WishlistItemCard";
-import { BrowserRouter } from "react-router-dom";
+import { render, screen, fireEvent } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
+import { describe, it, expect, vi } from 'vitest';
+import { WishlistItemCard, getDetailPath } from '@/components/WishlistItemCard';
 
-test("Details button navigates to correct vehicle route", () => {
-  const mockNavigate = vi.fn();
-  vi.mock("react-router-dom", () => ({
-    ...vi.importActual("react-router-dom"),
-    useNavigate: () => mockNavigate,
-  }));
+// Test vehicle details navigation
+describe('WishlistItemCard', () => {
+  it('Details button navigates to correct vehicle route', () => {
+    const mockNavigate = vi.fn();
+    vi.mock('react-router-dom', async () => {
+      const actual = await vi.importActual('react-router-dom');
+      return { ...actual, useNavigate: () => mockNavigate };
+    });
 
-  const mockVehicle = {
-    id: "test-id",
-    item_type: "vehicle",
-    item_uuid: "uuid-1",
-    product_id: undefined,
-    created_at: "",
-    product: {
-      name: "Test Car",
-      price: 90000,
-      image_url: "/placeholder.png",
-      in_stock: true,
-    },
-  };
+    const mockVehicle: import('@/types').WishlistItem = {
+      id: "uuid-1",
+      user_id: "user-1",
+      item_type: "vehicle",
+      item_uuid: "uuid-1",
+      product_id: 0,
+      created_at: new Date().toISOString(),
+      product: {
+        name: "Mock Car",
+        price: 99000,
+        image_url: "/car.jpg",
+        in_stock: true,
+      },
+    };
 
-  render(
-    <BrowserRouter>
-      <WishlistItemCard item={mockVehicle} view="grid" />
-    </BrowserRouter>
-  );
+    render(
+      <BrowserRouter>
+        <WishlistItemCard item={mockVehicle} view="grid" />
+      </BrowserRouter>
+    );
+    const btn = screen.getByTestId('details-btn');
+    fireEvent.click(btn);
+    expect(mockNavigate).toHaveBeenCalledWith("/vehicles/uuid-1");
+  });
 
-  const btn = screen.getByTestId("details-btn");
-  fireEvent.click(btn);
-  expect(mockNavigate).toHaveBeenCalledWith("/vehicles/uuid-1");
-});
-
-test("Displays correct price and image", () => {
-  const item = {
-    id: "id2",
-    item_type: "product",
-    item_uuid: "3",
-    product_id: 3,
-    created_at: "",
-    product: {
-      name: "Fancy",
-      price: 12345,
-      image_url: "/some.jpg",
-      in_stock: false,
-    },
-  };
-  render(
-    <BrowserRouter>
-      <WishlistItemCard item={item} view="list" />
-    </BrowserRouter>
-  );
-  expect(screen.getByText("₹12,345")).toBeInTheDocument();
-  expect(screen.getByAltText("Fancy")).toHaveAttribute("src", "/some.jpg");
+  it('Displays correct price and image', () => {
+    const mockItem: import('@/types').WishlistItem = {
+      id: "id2",
+      user_id: "user-2",
+      item_type: "product",
+      item_uuid: "prod-3",
+      product_id: 3,
+      created_at: new Date().toISOString(),
+      product: {
+        name: "Fancy",
+        price: 12345,
+        image_url: "/some.jpg",
+        in_stock: false,
+      },
+    };
+    render(
+      <BrowserRouter>
+        <WishlistItemCard item={mockItem} view="list" />
+      </BrowserRouter>
+    );
+    expect(screen.getByText("₹12,345")).toBeInTheDocument();
+    expect(screen.getByAltText("Fancy")).toHaveAttribute("src", "/some.jpg");
+  });
 });
