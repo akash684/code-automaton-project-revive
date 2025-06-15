@@ -3,8 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 // --- VEHICLES --- //
 
-// All vehicles have type 'car' or 'bike' in the products table
-
+// Fetch all vehicles
 export async function fetchVehicles({
   brand,
   fuel,
@@ -20,10 +19,7 @@ export async function fetchVehicles({
   search?: string;
   sort?: "price-asc" | "price-desc";
 }) {
-  let query = supabase
-    .from("products")
-    .select("*")
-    .or("type.eq.car,type.eq.bike");
+  let query = supabase.from("vehicles").select("*");
 
   if (brand) query = query.eq("brand", brand);
   if (fuel) query = query.eq("fuel", fuel);
@@ -40,56 +36,28 @@ export async function fetchVehicles({
   }
   const { data, error } = await query;
   if (error) throw error;
-  return (data ?? []).filter(
-    (item: any) => item.type === "car" || item.type === "bike"
-  );
+  return data ?? [];
 }
 
 export async function fetchVehicleBrands(): Promise<string[]> {
-  const { data, error } = await supabase
-    .from("products")
-    .select("brand, type")
-    .or("type.eq.car,type.eq.bike");
+  const { data, error } = await supabase.from("vehicles").select("brand");
   if (error) throw error;
-  return Array.from(
-    new Set((data ?? [])
-      .filter((v: any) => v.type === "car" || v.type === "bike")
-      .map((v: any) => v.brand)
-      .filter(Boolean))
-  ) as string[];
+  return Array.from(new Set((data ?? []).map((v: any) => v.brand).filter(Boolean))) as string[];
 }
 
 export async function fetchVehicleFuelTypes(): Promise<string[]> {
-  const { data, error } = await supabase
-    .from("products")
-    .select("fuel, type")
-    .or("type.eq.car,type.eq.bike");
+  const { data, error } = await supabase.from("vehicles").select("fuel");
   if (error) throw error;
-  return Array.from(
-    new Set((data ?? [])
-      .filter((v: any) => v.type === "car" || v.type === "bike")
-      .map((v: any) => v.fuel)
-      .filter(Boolean))
-  ) as string[];
+  return Array.from(new Set((data ?? []).map((v: any) => v.fuel).filter(Boolean))) as string[];
 }
 
 export async function fetchVehicleTransmissions(): Promise<string[]> {
-  const { data, error } = await supabase
-    .from("products")
-    .select("transmission, type")
-    .or("type.eq.car,type.eq.bike");
+  const { data, error } = await supabase.from("vehicles").select("transmission");
   if (error) throw error;
-  return Array.from(
-    new Set((data ?? [])
-      .filter((v: any) => v.type === "car" || v.type === "bike")
-      .map((v: any) => v.transmission)
-      .filter(Boolean))
-  ) as string[];
+  return Array.from(new Set((data ?? []).map((v: any) => v.transmission).filter(Boolean))) as string[];
 }
 
 // --- ACCESSORIES --- //
-
-// All accessories have type 'accessory' in the products table
 
 export async function fetchAccessories({
   brand,
@@ -104,7 +72,7 @@ export async function fetchAccessories({
   search?: string;
   sort?: "price-asc" | "price-desc";
 }) {
-  let query = supabase.from("products").select("*").eq("type", "accessory");
+  let query = supabase.from("accessories").select("*");
 
   if (brand) query = query.eq("brand", brand);
   if (category) query = query.eq("category", category);
@@ -121,33 +89,17 @@ export async function fetchAccessories({
 
   const { data, error } = await query;
   if (error) throw error;
-  return (data ?? []).filter((item: any) => item.type === "accessory");
+  return data ?? [];
 }
 
 export async function fetchAccessoryBrands(): Promise<string[]> {
-  const { data, error } = await supabase
-    .from("products")
-    .select("brand, type")
-    .eq("type", "accessory");
+  const { data, error } = await supabase.from("accessories").select("brand");
   if (error) throw error;
-  return Array.from(
-    new Set((data ?? [])
-      .filter((a: any) => a.type === "accessory")
-      .map((a: any) => a.brand)
-      .filter(Boolean))
-  ) as string[];
+  return Array.from(new Set((data ?? []).map((a: any) => a.brand).filter(Boolean))) as string[];
 }
 
 export async function fetchAccessoryCategories(): Promise<string[]> {
-  const { data, error } = await supabase
-    .from("products")
-    .select("category, type")
-    .eq("type", "accessory");
+  const { data, error } = await supabase.from("accessories").select("category");
   if (error) throw error;
-  return Array.from(
-    new Set((data ?? [])
-      .filter((a: any) => a.type === "accessory")
-      .map((a: any) => a.category)
-      .filter(Boolean))
-  ) as string[];
+  return Array.from(new Set((data ?? []).map((a: any) => a.category).filter(Boolean))) as string[];
 }
