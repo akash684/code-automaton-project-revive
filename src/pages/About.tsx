@@ -1,11 +1,10 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Users, Target, Award, Heart } from 'lucide-react';
 
-const About = () => {
+export default function About() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-950 min-h-screen text-white">
       <div className="container mx-auto px-4 py-8">
         {/* Hero Section */}
         <div className="text-center mb-16">
@@ -131,6 +130,4 @@ const About = () => {
       </div>
     </div>
   );
-};
-
-export default About;
+}

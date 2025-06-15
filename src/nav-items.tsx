@@ -1,13 +1,12 @@
-
 import { HomeIcon, Car, Wrench, Users, Phone, ShoppingCart, Heart, UserIcon } from "lucide-react";
 import Index from "./pages/Index";
 import Vehicles from "./pages/Vehicles";
 import Accessories from "./pages/Accessories";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
-// Removed Cart import
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
 
 export const navItems = [
   {
@@ -40,12 +39,17 @@ export const navItems = [
     icon: <Phone className="h-4 w-4" />,
     page: <Contact />,
   },
-  // Removed Cart entry
   {
     title: "Auth",
     to: "/auth",
     icon: <UserIcon className="h-4 w-4" />,
     page: <Auth />,
+  },
+  {
+    title: "Profile",
+    to: "/profile",
+    icon: <UserIcon className="h-4 w-4" />,
+    page: <Profile />,
   },
   {
     title: "Not Found",

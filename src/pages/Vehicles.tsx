@@ -19,6 +19,7 @@ import { motion } from "framer-motion";
 import { CardContent } from "@/components/ui/card";
 import { BuyModal } from "@/components/BuyModal";
 import { toast } from "sonner";
+import { useWishlist } from '@/hooks/useWishlist';
 
 const DEFAULT_PRICE_RANGE: [number, number] = [500, 2000000];
 
@@ -60,6 +61,8 @@ export default function Vehicles() {
       })
   });
 
+  const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
+
   // Reset logic to "all" instead of ""
   const handleReset = () => {
     setFilters({
@@ -74,7 +77,7 @@ export default function Vehicles() {
   };
 
   return (
-    <div className="bg-bg-secondary min-h-screen">
+    <div className="bg-gray-950 min-h-screen text-white">
       <main className="container mx-auto py-10">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar */}
@@ -237,20 +240,38 @@ export default function Vehicles() {
                       <Badge className="absolute top-3 right-3 bg-blue-700 text-white capitalize">
                         {vehicle.category}
                       </Badge>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className={`absolute bottom-3 right-3 border ${
+                          isInWishlist(vehicle.id)
+                            ? "bg-pink-700 border-pink-400 text-white"
+                            : "bg-gray-900 border-gray-700 text-gray-300"
+                        }`}
+                        onClick={() =>
+                          isInWishlist(vehicle.id)
+                            ? removeFromWishlist(vehicle.id)
+                            : addToWishlist(vehicle.id)
+                        }
+                        aria-label={isInWishlist(vehicle.id) ? "Remove from favourites" : "Add to favourites"}
+                        title={isInWishlist(vehicle.id) ? "Remove from favourites" : "Add to favourites"}
+                      >
+                        <Heart fill={isInWishlist(vehicle.id) ? "#ec4899" : "none"} className="w-5 h-5" />
+                      </Button>
                     </motion.div>
                     <CardContent className="p-5">
                       <div className="mb-1 font-heading text-lg font-semibold">{vehicle.model}</div>
-                      <div className="flex flex-wrap gap-2 text-sm text-gray-600 mb-2">
-                        <Badge variant="outline" className="bg-white/50 dark:bg-gray-800/50">{vehicle.brand}</Badge>
-                        <Badge variant="outline" className="bg-white/50 dark:bg-gray-800/50">{vehicle.fuel}</Badge>
-                        <Badge variant="outline" className="bg-white/50 dark:bg-gray-800/50">{vehicle.transmission}</Badge>
+                      <div className="flex flex-wrap gap-2 text-sm text-gray-300 mb-2">
+                        <Badge variant="outline" className="bg-white/10 border-gray-800 dark:bg-gray-800/50">{vehicle.brand}</Badge>
+                        <Badge variant="outline" className="bg-white/10 border-gray-800 dark:bg-gray-800/50">{vehicle.fuel}</Badge>
+                        <Badge variant="outline" className="bg-white/10 border-gray-800 dark:bg-gray-800/50">{vehicle.transmission}</Badge>
                       </div>
-                      <div className="text-2xl font-bold text-blue-700 mb-3">
+                      <div className="text-2xl font-bold text-blue-400 mb-3">
                         ₹{new Intl.NumberFormat("en-IN").format(vehicle.price)}
                       </div>
                       <div className="flex gap-2">
                         <Button
-                          className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                          className="flex-1 bg-gradient-to-r from-blue-700 to-purple-700 text-white"
                           disabled={!vehicle.available}
                           onClick={() => {
                             setSelectedItem({
