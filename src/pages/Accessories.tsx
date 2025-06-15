@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { CardContent } from "@/components/ui/card";
 import { BuyModal } from "@/components/BuyModal";
+import { toast } from "sonner";
 
 export default function Accessories() {
   const [filters, setFilters] = useState({
@@ -211,12 +212,12 @@ export default function Accessories() {
                           className="flex-1"
                           variant="outline"
                           disabled={!accessory.available}
-                          onClick={() => { /* Rent logic here */ toast.success('Rent flow coming soon!'); }}
+                          onClick={() => { toast.success('Rent flow coming soon!'); }}
                         >
                           Rent Now
                         </Button>
                         <Button
-                          className="flex-1"
+                          className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
                           disabled={!accessory.available}
                           onClick={() => {
                             setSelectedItem({
@@ -226,7 +227,6 @@ export default function Accessories() {
                             });
                             setBuyModalOpen(true);
                           }}
-                          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white"
                         >
                           Buy Now
                         </Button>

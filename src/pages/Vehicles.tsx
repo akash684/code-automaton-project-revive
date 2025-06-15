@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { CardContent } from "@/components/ui/card";
 import { BuyModal } from "@/components/BuyModal";
+import { toast } from "sonner";
 
 const DEFAULT_PRICE_RANGE: [number, number] = [500, 2000000];
 
@@ -252,12 +253,12 @@ export default function Vehicles() {
                           className="flex-1"
                           disabled={!vehicle.available}
                           variant="outline"
-                          onClick={() => { /* Rent logic here */ toast.success('Rent flow coming soon!'); }}
+                          onClick={() => { toast.success('Rent flow coming soon!'); }}
                         >
                           Rent Now
                         </Button>
                         <Button
-                          className="flex-1"
+                          className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
                           disabled={!vehicle.available}
                           onClick={() => {
                             setSelectedItem({
@@ -267,7 +268,6 @@ export default function Vehicles() {
                             });
                             setBuyModalOpen(true);
                           }}
-                          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white"
                         >
                           Buy Now
                         </Button>
