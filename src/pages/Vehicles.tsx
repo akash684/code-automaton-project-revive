@@ -96,9 +96,15 @@ export default function Vehicles() {
                     <SelectValue placeholder="All Types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="car">Car</SelectItem>
-                    <SelectItem value="bike">Bike</SelectItem>
+                    <SelectItem value="all" className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-[#0D1B3C] data-[state=checked]:text-white">
+                      All Types
+                    </SelectItem>
+                    <SelectItem value="car" className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-[#0D1B3C] data-[state=checked]:text-white">
+                      Car
+                    </SelectItem>
+                    <SelectItem value="bike" className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-[#0D1B3C] data-[state=checked]:text-white">
+                      Bike
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -113,9 +119,11 @@ export default function Vehicles() {
                     <SelectValue placeholder="All Brands" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Brands</SelectItem>
+                    <SelectItem value="all" className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-[#0D1B3C] data-[state=checked]:text-white">
+                      All Brands
+                    </SelectItem>
                     {brandsQuery.data?.map((brand: string) => (
-                      <SelectItem key={brand} value={brand}>
+                      <SelectItem key={brand} value={brand} className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-[#0D1B3C] data-[state=checked]:text-white">
                         {brand}
                       </SelectItem>
                     ))}
@@ -133,9 +141,11 @@ export default function Vehicles() {
                     <SelectValue placeholder="All Fuels" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Fuels</SelectItem>
+                    <SelectItem value="all" className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-[#0D1B3C] data-[state=checked]:text-white">
+                      All Fuels
+                    </SelectItem>
                     {fuelQuery.data?.map((f: string) => (
-                      <SelectItem key={f} value={f}>
+                      <SelectItem key={f} value={f} className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-[#0D1B3C] data-[state=checked]:text-white">
                         {f}
                       </SelectItem>
                     ))}
@@ -153,9 +163,11 @@ export default function Vehicles() {
                     <SelectValue placeholder="All Types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
+                    <SelectItem value="all" className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-[#0D1B3C] data-[state=checked]:text-white">
+                      All Types
+                    </SelectItem>
                     {transQuery.data?.map((t: string) => (
-                      <SelectItem key={t} value={t}>
+                      <SelectItem key={t} value={t} className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-[#0D1B3C] data-[state=checked]:text-white">
                         {t}
                       </SelectItem>
                     ))}
