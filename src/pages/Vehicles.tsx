@@ -1,105 +1,109 @@
-
-import { useState, useEffect } from 'react';
+import { useQuery } from "@tanstack/react-query";
+import { fetchVehicles, fetchVehicleBrands } from "@/services/supabase/products";
+import { VehicleCard } from "@/components/ui/vehicle-card";
+import { FilterPanel } from "@/components/ui/filter-panel";
+import { SearchBar } from "@/components/ui/search-bar";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
+import { useState } from "react";
 import { supabase } from '@/integrations/supabase/client';
 import { Product } from '@/types';
 import ProductCard from '@/components/ProductCard';
 import FiltersPanel, { Filters } from '@/components/FiltersPanel';
 import { toast } from 'sonner';
 
-const Vehicles = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState<Filters>({
-    category: '',
-    priceRange: [0, 2000000],
-    brand: '',
-    fuel: '',
-    transmission: ''
+const fuelTypes = ["Petrol", "Diesel", "Electric", "CNG"];
+const transmissionTypes = ["Manual", "Automatic"];
+
+export default function Vehicles() {
+  const [filters, setFilters] = useState({
+    brand: "",
+    fuel: "",
+    transmission: "",
+    priceRange: [50000, 2000000] as [number, number],
+  });
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("price-asc");
+
+  const brandsQuery = useQuery({
+    queryKey: ["vehicle-brands"],
+    queryFn: fetchVehicleBrands,
   });
 
-  useEffect(() => {
-    fetchProducts();
-  }, [filters]);
+  const vehiclesQuery = useQuery({
+    queryKey: [
+      "vehicles",
+      filters,
+      search,
+      sort
+    ],
+    queryFn: () =>
+      fetchVehicles({
+        ...filters,
+        priceRange: filters.priceRange,
+        search,
+        sort,
+      }),
+    keepPreviousData: true,
+  });
 
-  const fetchProducts = async () => {
-    try {
-      let query = supabase
-        .from('products')
-        .select('*')
-        .eq('available', true)
-        .in('category', ['car', 'bike']);
-
-      // Apply filters
-      if (filters.category) {
-        query = query.eq('category', filters.category);
-      }
-      if (filters.brand) {
-        query = query.eq('brand', filters.brand);
-      }
-      if (filters.fuel) {
-        query = query.eq('fuel', filters.fuel);
-      }
-      if (filters.transmission) {
-        query = query.eq('transmission', filters.transmission);
-      }
-
-      query = query
-        .gte('price', filters.priceRange[0])
-        .lte('price', filters.priceRange[1])
-        .order('featured', { ascending: false })
-        .order('created_at', { ascending: false });
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      setProducts(data || []);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      toast.error('Failed to load products');
-    } finally {
-      setLoading(false);
-    }
+  const handleReset = () => {
+    setFilters({
+      brand: "",
+      fuel: "",
+      transmission: "",
+      priceRange: [50000, 2000000],
+    });
+    setSearch("");
+    setSort("price-asc");
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">Vehicles 🚗🏍️</h1>
-          <p className="text-gray-600">Find your perfect vehicle from our extensive collection</p>
-        </div>
-
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div className="lg:w-1/4">
-            <FiltersPanel filters={filters} onFiltersChange={setFilters} />
-          </div>
-          
-          <div className="lg:w-3/4">
-            {products.length === 0 ? (
-              <div className="text-center py-16">
-                <h3 className="text-2xl font-semibold text-gray-800 mb-4">No vehicles found</h3>
-                <p className="text-gray-600">Try adjusting your filters to see more results.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                {products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+    <div className="bg-bg-secondary min-h-screen">
+      <main className="container mx-auto py-10">
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Sidebar */}
+          <aside className="md:w-64 mb-4 shrink-0">
+            <FilterPanel
+              brands={brandsQuery.data || []}
+              filters={filters}
+              onChange={setFilters}
+              minPrice={50000}
+              maxPrice={2000000}
+              fuelTypes={fuelTypes}
+              transmissionTypes={transmissionTypes}
+            />
+          </aside>
+          {/* Main content */}
+          <section className="flex-1 min-w-0">
+            <div className="flex flex-col md:flex-row md:items-center gap-4 pb-4">
+              <SearchBar value={search} onChange={setSearch} placeholder="Search vehicles..." />
+              {/* Sort */}
+              <Select value={sort} onValueChange={setSort}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sort" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="price-asc">Price: Low to High</SelectItem>
+                  <SelectItem value="price-desc">Price: High to Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {/* Loading */}
+            {vehiclesQuery.isLoading ? (
+              <div className="py-32 text-center text-gray-500 animate-pulse">Loading...</div>
+            ) : vehiclesQuery.data?.data?.length ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {vehiclesQuery.data.data.map((vehicle: any) => (
+                  <VehicleCard key={vehicle.id} vehicle={vehicle} />
                 ))}
               </div>
+            ) : (
+              <EmptyState onReset={handleReset} />
             )}
-          </div>
+          </section>
         </div>
-      </div>
+      </main>
     </div>
   );
-};
-
-export default Vehicles;
+}

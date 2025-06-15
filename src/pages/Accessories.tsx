@@ -1,109 +1,104 @@
+import { useQuery } from "@tanstack/react-query";
+import { fetchAccessories, fetchAccessoryBrands, fetchAccessoryCategories } from "@/services/supabase/products";
+import { AccessoryCard } from "@/components/ui/accessory-card";
+import { FilterPanel } from "@/components/ui/filter-panel";
+import { SearchBar } from "@/components/ui/search-bar";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
+import { useState } from "react";
 
-import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Product } from '@/types';
-import ProductCard from '@/components/ProductCard';
-import { toast } from 'sonner';
+export default function Accessories() {
+  const [filters, setFilters] = useState({
+    brand: "",
+    category: "",
+    priceRange: [500, 20000] as [number, number],
+  });
+  const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("price-asc");
 
-const Accessories = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const brandsQuery = useQuery({
+    queryKey: ["accessory-brands"],
+    queryFn: fetchAccessoryBrands,
+  });
 
-  const categories = ['interior', 'exterior', 'electronics', 'security'];
+  const categoriesQuery = useQuery({
+    queryKey: ["accessory-categories"],
+    queryFn: fetchAccessoryCategories,
+  });
 
-  useEffect(() => {
-    fetchProducts();
-  }, [selectedCategory]);
+  const accessoriesQuery = useQuery({
+    queryKey: [
+      "accessories",
+      filters,
+      search,
+      sort
+    ],
+    queryFn: () =>
+      fetchAccessories({
+        ...filters,
+        priceRange: filters.priceRange,
+        search,
+        sort,
+      }),
+    keepPreviousData: true,
+  });
 
-  const fetchProducts = async () => {
-    try {
-      let query = supabase
-        .from('products')
-        .select('*')
-        .eq('available', true)
-        .eq('category', 'accessory');
-
-      if (selectedCategory) {
-        query = query.eq('type', selectedCategory);
-      }
-
-      query = query
-        .order('featured', { ascending: false })
-        .order('created_at', { ascending: false });
-
-      const { data, error } = await query;
-
-      if (error) throw error;
-      setProducts(data || []);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      toast.error('Failed to load accessories');
-    } finally {
-      setLoading(false);
-    }
+  const handleReset = () => {
+    setFilters({
+      brand: "",
+      category: "",
+      priceRange: [500, 20000],
+    });
+    setSearch("");
+    setSort("price-asc");
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-4">Accessories 🛠️</h1>
-          <p className="text-gray-600">Enhance your vehicle with premium accessories</p>
+    <div className="bg-bg-secondary min-h-screen">
+      <main className="container mx-auto py-10">
+        <div className="flex flex-col md:flex-row gap-8">
+          {/* Sidebar */}
+          <aside className="md:w-64 mb-4 shrink-0">
+            <FilterPanel
+              brands={brandsQuery.data || []}
+              categories={categoriesQuery.data || []}
+              filters={filters}
+              onChange={setFilters}
+              minPrice={500}
+              maxPrice={20000}
+              withCategory
+            />
+          </aside>
+          {/* Main content */}
+          <section className="flex-1 min-w-0">
+            <div className="flex flex-col md:flex-row md:items-center gap-4 pb-4">
+              <SearchBar value={search} onChange={setSearch} placeholder="Search accessories..." />
+              {/* Sort */}
+              <Select value={sort} onValueChange={setSort}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sort" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="price-asc">Price: Low to High</SelectItem>
+                  <SelectItem value="price-desc">Price: High to Low</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {/* Loading */}
+            {accessoriesQuery.isLoading ? (
+              <div className="py-32 text-center text-gray-500 animate-pulse">Loading...</div>
+            ) : accessoriesQuery.data?.data?.length ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {accessoriesQuery.data.data.map((accessory: any) => (
+                  <AccessoryCard key={accessory.id} accessory={accessory} />
+                ))}
+              </div>
+            ) : (
+              <EmptyState onReset={handleReset} />
+            )}
+          </section>
         </div>
-
-        {/* Category Filter */}
-        <div className="mb-8">
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setSelectedCategory('')}
-              className={`px-4 py-2 rounded-full border ${
-                !selectedCategory 
-                  ? 'bg-blue-600 text-white border-blue-600' 
-                  : 'bg-white text-gray-700 border-gray-300 hover:border-blue-600'
-              }`}
-            >
-              All Categories
-            </button>
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full border capitalize ${
-                  selectedCategory === category 
-                    ? 'bg-blue-600 text-white border-blue-600' 
-                    : 'bg-white text-gray-700 border-gray-300 hover:border-blue-600'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {products.length === 0 ? (
-          <div className="text-center py-16">
-            <h3 className="text-2xl font-semibold text-gray-800 mb-4">No accessories found</h3>
-            <p className="text-gray-600">Try selecting a different category.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        )}
-      </div>
+      </main>
     </div>
   );
-};
-
-export default Accessories;
+}
