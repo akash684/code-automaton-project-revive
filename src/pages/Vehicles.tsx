@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -8,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { DEFAULT_PRICE_RANGE } from "@/constants/price";
 import type { Database } from "@/integrations/supabase/types";
+import { Vehicle } from "@/types/supabase";
 
 // Correct VehicleRow based on your schema
 type VehicleRow = Database["public"]["Tables"]["vehicles"]["Row"];
@@ -27,22 +27,20 @@ export default function Vehicles() {
   // --- Fetch logic for vehicles from the "vehicles" table ---
   const vehiclesQuery = useQuery({
     queryKey: ["vehicles", filters, search, sort, priceRange],
-    queryFn: async (): Promise<VehicleRow[]> => {
+    queryFn: async (): Promise<Vehicle[]> => {
       const { supabase } = await import("@/integrations/supabase/client");
 
       // Normalize filters for the DB
-      const catFilter = filters.category === "all" ? null : filters.category.toLowerCase().trim();
-      const brandFilter = filters.brand === "all" ? null : filters.brand.toLowerCase().trim();
-      const fuelFilter = filters.fuel === "all" ? null : filters.fuel.toLowerCase().trim();
-      const transFilter = filters.transmission === "all" ? null : filters.transmission.toLowerCase().trim();
+      const catFilter = filters.category === "all" ? null : filters.category.trim();
+      const brandFilter = filters.brand === "all" ? null : filters.brand.trim();
+      const fuelFilter = filters.fuel === "all" ? null : filters.fuel.trim();
+      const transFilter = filters.transmission === "all" ? null : filters.transmission.trim();
 
-      // Correct: from<T, R>(table: string)
-      let query = supabase.from<VehicleRow, VehicleRow>("vehicles").select("*");
+      let query = supabase.from("vehicles").select("*");
 
       if (catFilter) {
         query = query.eq("category", catFilter);
       } else {
-        // Note: category value is a string on schema, so use an array of strings
         query = query.in("category", ["car", "bike"]);
       }
 
@@ -52,12 +50,11 @@ export default function Vehicles() {
       } else if (sort === "price-desc") {
         query = query.order("price", { ascending: false });
       }
-
       if (brandFilter) query = query.eq("brand", brandFilter);
       if (fuelFilter) query = query.eq("fuel", fuelFilter);
       if (transFilter) query = query.eq("transmission", transFilter);
 
-      // Apply price range only if not at defaults
+      // Apply price range filter
       if (
         priceRange &&
         (priceRange[0] !== DEFAULT_PRICE_RANGE[0] || priceRange[1] !== DEFAULT_PRICE_RANGE[1])
@@ -72,11 +69,13 @@ export default function Vehicles() {
         toast.error("Failed to load vehicles!");
         return [];
       }
-      if (!data || data.length === 0) {
+      if (!Array.isArray(data) || !data) {
         toast.info("No cars or bikes found. Check filters or Supabase policy.");
+        return [];
       }
 
-      return data ?? [];
+      // Type assertion to Vehicle[]
+      return data as Vehicle[];
     },
   });
 
@@ -229,4 +228,3 @@ export default function Vehicles() {
     </div>
   );
 }
-// ... end of file
