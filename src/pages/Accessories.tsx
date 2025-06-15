@@ -1,4 +1,3 @@
-
 // Accessories Page - fetches from "accessories" table
 
 import { useQuery } from "@tanstack/react-query";
@@ -13,9 +12,9 @@ import { useState } from "react";
 
 export default function Accessories() {
   const [filters, setFilters] = useState({
-    category: "",
-    compatibleVehicleType: "",
-    inStock: "",
+    category: "all",
+    compatibleVehicleType: "all",
+    inStock: "all",
   });
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("price-asc");
@@ -23,7 +22,7 @@ export default function Accessories() {
   // Dynamic filters
   const catQuery = useQuery<string[]>({ queryKey: ["accessory-categories"], queryFn: fetchAccessoryCategories });
 
-  // Main fetch
+  // Main fetch, map "all" to undefined
   const accessoriesQuery = useQuery({
     queryKey: [
       "accessories",
@@ -33,8 +32,11 @@ export default function Accessories() {
     ],
     queryFn: () =>
       fetchAccessories({
-        ...filters,
-        inStock: filters.inStock === "" ? undefined : filters.inStock === "true",
+        category: filters.category === "all" ? undefined : filters.category,
+        compatibleVehicleType:
+          filters.compatibleVehicleType === "all" ? undefined : filters.compatibleVehicleType,
+        inStock:
+          filters.inStock === "all" ? undefined : filters.inStock === "true",
         search,
         sort: sort as "price-asc" | "price-desc",
       }),
@@ -42,9 +44,9 @@ export default function Accessories() {
 
   const handleReset = () => {
     setFilters({
-      category: "",
-      compatibleVehicleType: "",
-      inStock: "",
+      category: "all",
+      compatibleVehicleType: "all",
+      inStock: "all",
     });
     setSearch("");
     setSort("price-asc");
@@ -68,7 +70,7 @@ export default function Accessories() {
                     <SelectValue placeholder="All Types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Types</SelectItem>
+                    <SelectItem value="all">All Types</SelectItem>
                     {catQuery.data?.map((cat: string) => (
                       <SelectItem key={cat} value={cat}>
                         {cat}
@@ -82,13 +84,15 @@ export default function Accessories() {
                 <div className="font-medium mb-1">Compatible For</div>
                 <Select
                   value={filters.compatibleVehicleType}
-                  onValueChange={v => setFilters(f => ({ ...f, compatibleVehicleType: v }))}
+                  onValueChange={v =>
+                    setFilters(f => ({ ...f, compatibleVehicleType: v }))
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="All Vehicles" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Vehicles</SelectItem>
+                    <SelectItem value="all">All Vehicles</SelectItem>
                     <SelectItem value="car">Car</SelectItem>
                     <SelectItem value="bike">Bike</SelectItem>
                   </SelectContent>
@@ -105,7 +109,7 @@ export default function Accessories() {
                     <SelectValue placeholder="All" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All</SelectItem>
+                    <SelectItem value="all">All</SelectItem>
                     <SelectItem value="true">In Stock</SelectItem>
                     <SelectItem value="false">Out of Stock</SelectItem>
                   </SelectContent>

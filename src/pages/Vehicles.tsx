@@ -1,4 +1,3 @@
-
 // Vehicles Page - fetches from "vehicles" table
 
 import { useQuery } from "@tanstack/react-query";
@@ -17,10 +16,10 @@ const DEFAULT_PRICE_RANGE: [number, number] = [500, 2000000];
 
 export default function Vehicles() {
   const [filters, setFilters] = useState({
-    category: "",
-    brand: "",
-    fuel: "",
-    transmission: "",
+    category: "all",
+    brand: "all",
+    fuel: "all",
+    transmission: "all",
     priceRange: DEFAULT_PRICE_RANGE as [number, number],
   });
   const [search, setSearch] = useState("");
@@ -31,7 +30,7 @@ export default function Vehicles() {
   const fuelQuery = useQuery<string[]>({ queryKey: ["vehicle-fuels"], queryFn: fetchVehicleFuelTypes });
   const transQuery = useQuery<string[]>({ queryKey: ["vehicle-transmissions"], queryFn: fetchVehicleTransmissions });
 
-  // Main fetch
+  // Main fetch, map "all" to undefined for backend
   const vehiclesQuery = useQuery({
     queryKey: [
       "vehicles",
@@ -41,20 +40,23 @@ export default function Vehicles() {
     ],
     queryFn: () =>
       fetchVehicles({
-        ...filters,
-        category: filters.category as "car" | "bike" | "",
+        category: filters.category === "all" ? undefined : (filters.category as "car" | "bike" | ""),
+        brand: filters.brand === "all" ? undefined : filters.brand,
+        fuel: filters.fuel === "all" ? undefined : filters.fuel,
+        transmission: filters.transmission === "all" ? undefined : filters.transmission,
         priceRange: filters.priceRange,
         search,
         sort: sort as "price-asc" | "price-desc",
       })
   });
 
+  // Reset logic to "all" instead of ""
   const handleReset = () => {
     setFilters({
-      category: "",
-      brand: "",
-      fuel: "",
-      transmission: "",
+      category: "all",
+      brand: "all",
+      fuel: "all",
+      transmission: "all",
       priceRange: DEFAULT_PRICE_RANGE,
     });
     setSearch("");
@@ -79,7 +81,7 @@ export default function Vehicles() {
                     <SelectValue placeholder="All Types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Types</SelectItem>
+                    <SelectItem value="all">All Types</SelectItem>
                     <SelectItem value="car">Car</SelectItem>
                     <SelectItem value="bike">Bike</SelectItem>
                   </SelectContent>
@@ -97,7 +99,7 @@ export default function Vehicles() {
                     <SelectValue placeholder="All Brands" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Brands</SelectItem>
+                    <SelectItem value="all">All Brands</SelectItem>
                     {brandsQuery.data?.map((brand: string) => (
                       <SelectItem key={brand} value={brand}>
                         {brand}
@@ -118,7 +120,7 @@ export default function Vehicles() {
                     <SelectValue placeholder="All Fuels" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Fuels</SelectItem>
+                    <SelectItem value="all">All Fuels</SelectItem>
                     {fuelQuery.data?.map((f: string) => (
                       <SelectItem key={f} value={f}>
                         {f}
@@ -139,7 +141,7 @@ export default function Vehicles() {
                     <SelectValue placeholder="All Types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Types</SelectItem>
+                    <SelectItem value="all">All Types</SelectItem>
                     {transQuery.data?.map((t: string) => (
                       <SelectItem key={t} value={t}>
                         {t}
