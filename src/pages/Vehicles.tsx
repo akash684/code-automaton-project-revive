@@ -43,8 +43,7 @@ export default function Vehicles() {
         priceRange: filters.priceRange,
         search,
         sort,
-      }),
-    keepPreviousData: true,
+      })
   });
 
   const handleReset = () => {

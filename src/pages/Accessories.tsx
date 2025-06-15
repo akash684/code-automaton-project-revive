@@ -40,7 +40,6 @@ export default function Accessories() {
         search,
         sort,
       }),
-    keepPreviousData: true,
   });
 
   const handleReset = () => {
