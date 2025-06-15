@@ -70,9 +70,32 @@ export default function Accessories() {
                     <SelectValue placeholder="All Types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Types</SelectItem>
+                    {/* Highlight styling for Accessories and Vehicles options */}
+                    <SelectItem 
+                      value="all" 
+                      className="flex items-center text-gray-700 font-semibold"
+                    >
+                      All Types
+                    </SelectItem>
+                    {/* Example: color for Gear-related types */}
                     {catQuery.data?.map((cat: string) => (
-                      <SelectItem key={cat} value={cat}>
+                      <SelectItem
+                        key={cat}
+                        value={cat}
+                        className={
+                          cat.toLowerCase().includes('helmet')
+                            ? "flex items-center text-blue-700 font-bold"
+                            : cat.toLowerCase().includes('gloves')
+                              ? "flex items-center text-green-700"
+                              : cat.toLowerCase().includes('jackets')
+                                ? "flex items-center text-pink-700"
+                                : cat.toLowerCase().includes('mobile')
+                                  ? "flex items-center text-teal-700"
+                                  : cat.toLowerCase().includes('gps')
+                                    ? "flex items-center text-yellow-700"
+                                    : "flex items-center"
+                        }
+                      >
                         {cat}
                       </SelectItem>
                     ))}
