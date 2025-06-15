@@ -1,29 +1,29 @@
+
+// Accessories Page - fetches from "accessories" table
+
 import { useQuery } from "@tanstack/react-query";
 import {
   fetchAccessories,
-  fetchAccessoryBrands,
-  fetchAccessoryCategories
+  fetchAccessoryCategories,
 } from "@/services/supabase/products";
 import { AccessoryCard } from "@/components/ui/accessory-card";
-import { FilterPanel } from "@/components/ui/filter-panel";
 import { Input } from "@/components/ui/input";
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
 import { useState } from "react";
 
-const DEFAULT_PRICE_RANGE: [number, number] = [500, 20000];
-
 export default function Accessories() {
   const [filters, setFilters] = useState({
-    brand: "",
     category: "",
-    priceRange: DEFAULT_PRICE_RANGE as [number, number],
+    compatibleVehicleType: "",
+    inStock: "",
   });
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("price-asc");
 
-  const brandsQuery = useQuery<string[]>({ queryKey: ["accessory-brands"], queryFn: fetchAccessoryBrands });
+  // Dynamic filters
   const catQuery = useQuery<string[]>({ queryKey: ["accessory-categories"], queryFn: fetchAccessoryCategories });
 
+  // Main fetch
   const accessoriesQuery = useQuery({
     queryKey: [
       "accessories",
@@ -34,7 +34,7 @@ export default function Accessories() {
     queryFn: () =>
       fetchAccessories({
         ...filters,
-        priceRange: filters.priceRange,
+        inStock: filters.inStock === "" ? undefined : filters.inStock === "true",
         search,
         sort: sort as "price-asc" | "price-desc",
       }),
@@ -42,9 +42,9 @@ export default function Accessories() {
 
   const handleReset = () => {
     setFilters({
-      brand: "",
       category: "",
-      priceRange: DEFAULT_PRICE_RANGE,
+      compatibleVehicleType: "",
+      inStock: "",
     });
     setSearch("");
     setSort("price-asc");
@@ -56,15 +56,66 @@ export default function Accessories() {
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar */}
           <aside className="md:w-64 mb-4 shrink-0">
-            <FilterPanel
-              brands={brandsQuery.data ?? []}
-              categories={catQuery.data ?? []}
-              filters={filters}
-              onChange={setFilters}
-              minPrice={DEFAULT_PRICE_RANGE[0]}
-              maxPrice={DEFAULT_PRICE_RANGE[1]}
-              withCategory
-            />
+            <div className="space-y-6 p-4 rounded bg-white shadow">
+              {/* Category */}
+              <div>
+                <div className="font-medium mb-1">Type</div>
+                <Select
+                  value={filters.category}
+                  onValueChange={v => setFilters(f => ({ ...f, category: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Types</SelectItem>
+                    {catQuery.data?.map((cat: string) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {/* Compatible Vehicle */}
+              <div>
+                <div className="font-medium mb-1">Compatible For</div>
+                <Select
+                  value={filters.compatibleVehicleType}
+                  onValueChange={v => setFilters(f => ({ ...f, compatibleVehicleType: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Vehicles" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Vehicles</SelectItem>
+                    <SelectItem value="car">Car</SelectItem>
+                    <SelectItem value="bike">Bike</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {/* Stock */}
+              <div>
+                <div className="font-medium mb-1">Stock Status</div>
+                <Select
+                  value={filters.inStock}
+                  onValueChange={v => setFilters(f => ({ ...f, inStock: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All</SelectItem>
+                    <SelectItem value="true">In Stock</SelectItem>
+                    <SelectItem value="false">Out of Stock</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              {/* Reset */}
+              <button className="text-blue-700 mt-3 w-full" onClick={handleReset}>
+                Reset Filters
+              </button>
+            </div>
           </aside>
           {/* Main content */}
           <section className="flex-1 min-w-0">

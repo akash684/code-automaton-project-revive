@@ -9,6 +9,48 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      accessories: {
+        Row: {
+          available: boolean | null
+          category: string
+          compatible_vehicle_types: string[]
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+          price: number
+          stock: number
+          updated_at: string | null
+        }
+        Insert: {
+          available?: boolean | null
+          category: string
+          compatible_vehicle_types: string[]
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          price: number
+          stock?: number
+          updated_at?: string | null
+        }
+        Update: {
+          available?: boolean | null
+          category?: string
+          compatible_vehicle_types?: string[]
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          price?: number
+          stock?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       bikes: {
         Row: {
           available: boolean
@@ -517,6 +559,51 @@ export type Database = {
           phone?: string | null
           pincode?: string | null
           state?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      vehicles: {
+        Row: {
+          available: boolean | null
+          brand: string
+          category: string
+          created_at: string | null
+          description: string | null
+          fuel: string | null
+          id: string
+          image_url: string | null
+          model: string
+          price: number
+          transmission: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          available?: boolean | null
+          brand: string
+          category: string
+          created_at?: string | null
+          description?: string | null
+          fuel?: string | null
+          id?: string
+          image_url?: string | null
+          model: string
+          price: number
+          transmission?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          available?: boolean | null
+          brand?: string
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          fuel?: string | null
+          id?: string
+          image_url?: string | null
+          model?: string
+          price?: number
+          transmission?: string | null
           updated_at?: string | null
         }
         Relationships: []

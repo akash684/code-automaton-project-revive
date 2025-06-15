@@ -1,3 +1,6 @@
+
+// Vehicles Page - fetches from "vehicles" table
+
 import { useQuery } from "@tanstack/react-query";
 import {
   fetchVehicles,
@@ -6,15 +9,15 @@ import {
   fetchVehicleTransmissions
 } from "@/services/supabase/products";
 import { VehicleCard } from "@/components/ui/vehicle-card";
-import { FilterPanel } from "@/components/ui/filter-panel";
 import { Input } from "@/components/ui/input";
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
 import { useState } from "react";
 
-const DEFAULT_PRICE_RANGE: [number, number] = [50000, 2000000];
+const DEFAULT_PRICE_RANGE: [number, number] = [500, 2000000];
 
 export default function Vehicles() {
   const [filters, setFilters] = useState({
+    category: "",
     brand: "",
     fuel: "",
     transmission: "",
@@ -23,7 +26,7 @@ export default function Vehicles() {
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("price-asc");
 
-  // Fetch dynamic filters
+  // Dynamic filter options
   const brandsQuery = useQuery<string[]>({ queryKey: ["vehicle-brands"], queryFn: fetchVehicleBrands });
   const fuelQuery = useQuery<string[]>({ queryKey: ["vehicle-fuels"], queryFn: fetchVehicleFuelTypes });
   const transQuery = useQuery<string[]>({ queryKey: ["vehicle-transmissions"], queryFn: fetchVehicleTransmissions });
@@ -39,6 +42,7 @@ export default function Vehicles() {
     queryFn: () =>
       fetchVehicles({
         ...filters,
+        category: filters.category as "car" | "bike" | "",
         priceRange: filters.priceRange,
         search,
         sort: sort as "price-asc" | "price-desc",
@@ -47,6 +51,7 @@ export default function Vehicles() {
 
   const handleReset = () => {
     setFilters({
+      category: "",
       brand: "",
       fuel: "",
       transmission: "",
@@ -62,15 +67,118 @@ export default function Vehicles() {
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar */}
           <aside className="md:w-64 mb-4 shrink-0">
-            <FilterPanel
-              brands={brandsQuery.data ?? []}
-              filters={filters}
-              onChange={setFilters}
-              minPrice={DEFAULT_PRICE_RANGE[0]}
-              maxPrice={DEFAULT_PRICE_RANGE[1]}
-              fuelTypes={fuelQuery.data ?? []}
-              transmissionTypes={transQuery.data ?? []}
-            />
+            <div className="space-y-6 p-4 rounded bg-white shadow">
+              {/* Vehicle Type */}
+              <div>
+                <div className="font-medium mb-1">Type</div>
+                <Select
+                  value={filters.category}
+                  onValueChange={v => setFilters(f => ({ ...f, category: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Types</SelectItem>
+                    <SelectItem value="car">Car</SelectItem>
+                    <SelectItem value="bike">Bike</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Brand */}
+              <div>
+                <div className="font-medium mb-1">Brand</div>
+                <Select
+                  value={filters.brand}
+                  onValueChange={v => setFilters(f => ({ ...f, brand: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Brands" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Brands</SelectItem>
+                    {brandsQuery.data?.map((brand: string) => (
+                      <SelectItem key={brand} value={brand}>
+                        {brand}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Fuel */}
+              <div>
+                <div className="font-medium mb-1">Fuel</div>
+                <Select
+                  value={filters.fuel}
+                  onValueChange={v => setFilters(f => ({ ...f, fuel: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Fuels" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Fuels</SelectItem>
+                    {fuelQuery.data?.map((f: string) => (
+                      <SelectItem key={f} value={f}>
+                        {f}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Transmission */}
+              <div>
+                <div className="font-medium mb-1">Transmission</div>
+                <Select
+                  value={filters.transmission}
+                  onValueChange={v => setFilters(f => ({ ...f, transmission: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">All Types</SelectItem>
+                    {transQuery.data?.map((t: string) => (
+                      <SelectItem key={t} value={t}>
+                        {t}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Price */}
+              <div>
+                <div className="font-medium mb-1">Price</div>
+                <input
+                  type="range"
+                  min={DEFAULT_PRICE_RANGE[0]}
+                  max={DEFAULT_PRICE_RANGE[1]}
+                  value={filters.priceRange[0]}
+                  onChange={e => setFilters(f => ({ ...f, priceRange: [Number(e.target.value), f.priceRange[1]] }))}
+                  className="w-full"
+                />
+                <input
+                  type="range"
+                  min={DEFAULT_PRICE_RANGE[0]}
+                  max={DEFAULT_PRICE_RANGE[1]}
+                  value={filters.priceRange[1]}
+                  onChange={e => setFilters(f => ({ ...f, priceRange: [f.priceRange[0], Number(e.target.value)] }))}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs mt-1">
+                  <span>₹{filters.priceRange[0]}</span>
+                  <span>₹{filters.priceRange[1]}</span>
+                </div>
+              </div>
+
+              {/* Reset */}
+              <button className="text-blue-700 mt-3 w-full" onClick={handleReset}>
+                Reset Filters
+              </button>
+            </div>
           </aside>
           {/* Main content */}
           <section className="flex-1 min-w-0">
@@ -78,7 +186,7 @@ export default function Vehicles() {
               <Input
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                placeholder="Search vehicles…"
+                placeholder="Search by Model…"
                 className="md:max-w-xs"
               />
               {/* Sort */}
@@ -92,7 +200,7 @@ export default function Vehicles() {
                 </SelectContent>
               </Select>
             </div>
-            {/* Loading */}
+            {/* Loading state */}
             {vehiclesQuery.isLoading ? (
               <div className="py-32 text-center text-gray-500 animate-pulse">Loading...</div>
             ) : vehiclesQuery.isError ? (
