@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -37,30 +38,23 @@ export default function Vehicles() {
       const { supabase } = await import("@/integrations/supabase/client");
 
       // Normalize filters for the DB
-      const catFilter = filters.category === "all" ? null : filters.category.trim();
-      const brandFilter = filters.brand === "all" ? null : filters.brand.trim();
-      const fuelFilter = filters.fuel === "all" ? null : filters.fuel.trim();
-      const transFilter = filters.transmission === "all" ? null : filters.transmission.trim();
+      const catFilter = filters.category !== "all" && filters.category !== "" ? filters.category.trim() : null;
+      const brandFilter = filters.brand !== "all" && filters.brand !== "" ? filters.brand.trim() : null;
+      const fuelFilter = filters.fuel !== "all" && filters.fuel !== "" ? filters.fuel.trim() : null;
+      const transFilter = filters.transmission !== "all" && filters.transmission !== "" ? filters.transmission.trim() : null;
 
       let query = supabase.from("vehicles").select("*");
 
-      if (catFilter) {
-        query = query.eq("category", catFilter);
-      } else {
-        query = query.in("category", ["car", "bike"]);
-      }
-
-      if (search) query = query.ilike("model", `%${search}%`);
-      if (sort === "price-asc") {
-        query = query.order("price", { ascending: true });
-      } else if (sort === "price-desc") {
-        query = query.order("price", { ascending: false });
-      }
+      if (catFilter) query = query.eq("category", catFilter);
       if (brandFilter) query = query.eq("brand", brandFilter);
       if (fuelFilter) query = query.eq("fuel", fuelFilter);
       if (transFilter) query = query.eq("transmission", transFilter);
 
-      // Apply price range filter
+      if (search) query = query.ilike("model", `%${search}%`);
+      if (sort === "price-asc") query = query.order("price", { ascending: true });
+      else if (sort === "price-desc") query = query.order("price", { ascending: false });
+
+      // Apply price range filter if different from default
       if (
         priceRange &&
         (priceRange[0] !== DEFAULT_PRICE_RANGE[0] || priceRange[1] !== DEFAULT_PRICE_RANGE[1])
@@ -79,8 +73,6 @@ export default function Vehicles() {
         toast.info("No cars or bikes found. Check filters or Supabase policy.");
         return [];
       }
-
-      // Type assertion to Vehicle[]
       return data as Vehicle[];
     },
   });
@@ -98,6 +90,14 @@ export default function Vehicles() {
     setSort("price-asc");
   };
 
+  // Helpers for cleaner UI logic
+  const handleFilterChange = (key: keyof typeof filters, value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value === "" ? "all" : value,
+    }));
+  };
+
   return (
     <div className="bg-background min-h-screen text-foreground">
       <main className="container mx-auto py-10">
@@ -109,7 +109,7 @@ export default function Vehicles() {
               <div className="font-medium mb-1">Type</div>
               <Select
                 value={filters.category}
-                onValueChange={v => setFilters(f => ({ ...f, category: v }))}
+                onValueChange={v => handleFilterChange("category", v)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="All Types" />
@@ -127,10 +127,7 @@ export default function Vehicles() {
               <Input
                 value={filters.brand === "all" ? "" : filters.brand}
                 placeholder="All Brands"
-                onChange={e => setFilters(f => ({
-                  ...f,
-                  brand: e.target.value.trim() || "all",
-                }))}
+                onChange={e => handleFilterChange("brand", e.target.value)}
               />
             </div>
             {/* Fuel */}
@@ -139,10 +136,7 @@ export default function Vehicles() {
               <Input
                 value={filters.fuel === "all" ? "" : filters.fuel}
                 placeholder="All Fuels"
-                onChange={e => setFilters(f => ({
-                  ...f,
-                  fuel: e.target.value.trim() || "all",
-                }))}
+                onChange={e => handleFilterChange("fuel", e.target.value)}
               />
             </div>
             {/* Transmission */}
@@ -151,10 +145,7 @@ export default function Vehicles() {
               <Input
                 value={filters.transmission === "all" ? "" : filters.transmission}
                 placeholder="All Transmissions"
-                onChange={e => setFilters(f => ({
-                  ...f,
-                  transmission: e.target.value.trim() || "all",
-                }))}
+                onChange={e => handleFilterChange("transmission", e.target.value)}
               />
             </div>
             {/* Price with Sliders */}
@@ -233,12 +224,16 @@ export default function Vehicles() {
       </main>
       {/* Buy Modal */}
       {selectedItem && (
-        <BuyModal
-          open={buyModalOpen}
-          onOpenChange={(open) => setBuyModalOpen(open)}
-          item={selectedItem}
-          itemType="Vehicle"
-        />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-card border border-border rounded-2xl p-6 max-w-sm w-full shadow-xl">
+            <BuyModal
+              open={buyModalOpen}
+              onOpenChange={(open) => setBuyModalOpen(open)}
+              item={selectedItem}
+              itemType="Vehicle"
+            />
+          </div>
+        </div>
       )}
     </div>
   );
