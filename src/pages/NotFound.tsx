@@ -5,6 +5,7 @@ import { Heart, ShoppingCart, Eye, Trash2, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { WishlistItemCard } from "@/components/WishlistItemCard";
 
 type ViewType = "grid" | "list";
 type SortType = "date" | "price" | "stock" | "brand";
@@ -143,7 +144,6 @@ export default function WishlistPage() {
   return (
     <section className="min-h-screen bg-slate-900 py-10 px-2 sm:px-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header controls */}
         <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-7">
           <h1 className="text-3xl font-heading font-bold text-white flex items-center gap-2 mb-2 md:mb-0">
             <Heart className="w-8 h-8 text-pink-600" fill="#ec4899" />
@@ -151,7 +151,6 @@ export default function WishlistPage() {
             <span className="ml-2 text-sm bg-gray-700 text-gray-200 rounded-full px-3 py-1">{wishlistItems.length}</span>
           </h1>
           <div className="flex flex-wrap gap-3 items-center">
-            {/* View Toggle */}
             <div className="flex rounded-lg bg-slate-800 p-1">
               <Button
                 variant={view === "grid" ? "secondary" : "ghost"}
@@ -181,7 +180,6 @@ export default function WishlistPage() {
                 </svg>
               </Button>
             </div>
-            {/* Grouping toggle */}
             <Button
               size="sm"
               variant={groupByCategory ? "secondary" : "ghost"}
@@ -190,7 +188,6 @@ export default function WishlistPage() {
             >
               {groupByCategory ? "Ungroup" : "Group by Category"}
             </Button>
-            {/* Sort By */}
             <select
               className="bg-slate-800 text-slate-200 px-3 py-2 rounded-lg border border-slate-600"
               value={sort}
@@ -204,307 +201,12 @@ export default function WishlistPage() {
             </select>
           </div>
         </header>
-
-        {/* Wishlist List/Group/Grid */}
-        {groupByCategory && Object.keys(grouped).length > 0 ? (
-          Object.entries(grouped).map(([category, items]) => (
-            <div key={category} className="mb-9">
-              <div className="text-lg font-bold text-fuchsia-400 mb-4">{category}</div>
-              <div className={gridCols}>
-                <AnimatePresence>
-                  {items.map((item) => (
-                    <WishlistCard
-                      key={item.id}
-                      item={item}
-                      view={view}
-                      removing={removingId === item.id}
-                      onRemove={() => removeItem(item.id, item.product_id ?? item.item_uuid)}
-                    />
-                  ))}
-                </AnimatePresence>
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className={gridCols}>
-            <AnimatePresence>
-              {sortedItems.map((item) => (
-                <WishlistCard
-                  key={item.id}
-                  item={item}
-                  view={view}
-                  removing={removingId === item.id}
-                  onRemove={() => removeItem(item.id, item.product_id ?? item.item_uuid)}
-                />
-              ))}
-            </AnimatePresence>
-          </div>
-        )}
+        <div className={view === "grid" ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" : "flex flex-col gap-4"}>
+          {wishlistItems.map((item) => (
+            <WishlistItemCard key={item.id} item={item} view={view} />
+          ))}
+        </div>
       </div>
     </section>
-  );
-}
-
-// ---- Card Component for a Wishlist Item ----
-import { useWishlistProductDetails } from "@/hooks/useWishlistProductDetails";
-
-function WishlistCard({
-  item,
-  view,
-  removing,
-  onRemove,
-}: {
-  item: any;
-  view: ViewType;
-  removing: boolean;
-  onRemove: () => void;
-}) {
-  // If this is a product-type wishlist item and product data is missing, fetch it
-  const useDirectProduct =
-    item.item_type === "product" && typeof item.product === "object" && item.product !== null;
-  const { product: fetchedProduct } = useWishlistProductDetails(
-    !useDirectProduct && item.item_type === "product" ? item.product_id : null
-  );
-
-  // Prefer order: embedded product data > fetched product data > raw item data
-  const productData = useDirectProduct
-    ? item.product
-    : (fetchedProduct ? fetchedProduct : null);
-
-  let image =
-    productData?.image_url ||
-    item.image_url ||
-    item.image ||
-    "/placeholder.svg";
-  let title =
-    productData?.name ||
-    item.title ||
-    (item.brand && item.model
-      ? `${item.brand} ${item.model}`
-      : "") ||
-    item.brand ||
-    item.name ||
-    "Item";
-
-  let price =
-    typeof productData?.price === "number"
-      ? productData.price
-      : typeof item.price === "number"
-      ? item.price
-      : typeof productData?.price_inr === "number"
-      ? productData.price_inr
-      : typeof item.price_inr === "number"
-      ? item.price_inr
-      : undefined;
-
-  let stock =
-    productData?.in_stock ??
-    productData?.available ??
-    item.product?.in_stock ??
-    item.product?.available ??
-    item.available ??
-    true;
-
-  let category =
-    productData?.category ||
-    item.category ||
-    productData?.type ||
-    item.type ||
-    (item.item_type === "vehicle"
-      ? "Vehicle"
-      : item.item_type === "accessory"
-      ? "Accessory"
-      : "Misc");
-  let rating = productData?.rating || item.rating || undefined;
-  let brand = productData?.brand || item.brand || undefined;
-
-  let description =
-    productData?.description || item.description || undefined;
-
-  let detailsLink =
-    item.item_type === "product"
-      ? `/products/${productData?.slug ?? item.product_id ?? item.id ?? ""}`
-      : item.item_type === "vehicle"
-      ? `/vehicles/${item.item_uuid ?? item.id ?? ""}`
-      : item.item_type === "accessory"
-      ? `/accessories/${item.item_uuid ?? item.id ?? ""}`
-      : "#";
-
-  // Animation variants
-  const cardVariants = {
-    initial: { opacity: 0, y: 30, scale: 0.97 },
-    animate: { opacity: 1, y: 0, scale: 1 },
-    exit: {
-      opacity: 0,
-      y: 60,
-      scale: 0.95,
-      transition: { duration: 0.35 },
-    },
-  };
-
-  // Responsive/variant styles
-  const cardStyles =
-    view === "grid"
-      ? "rounded-2xl shadow-xl bg-slate-800/90 border border-slate-700 hover:shadow-2xl ring-1 ring-transparent hover:ring-fuchsia-600 transition-all duration-150 flex flex-col min-h-[420px] relative"
-      : "rounded-xl shadow-lg bg-slate-800/95 border border-slate-700 flex flex-row items-center gap-4 p-3 min-h-[110px] hover:ring-2 hover:ring-fuchsia-500 relative";
-
-  // Image box, new: works for all types
-  const imageBox =
-    <div className={cn(
-      "bg-slate-900 border border-slate-700 rounded-lg overflow-hidden flex items-center justify-center transition-transform duration-300 relative",
-      view === "grid" ? "h-44 w-full mb-3" : "h-24 w-24 mr-5"
-    )}>
-      <img
-        src={image}
-        alt={title}
-        className={cn("object-cover transition-transform duration-300 hover:scale-110", view === "grid" ? "w-full h-full" : "h-full w-full")}
-        loading="lazy"
-      />
-      {/* Stock Badge */}
-      <span className={cn(badgeClasses(stock), "absolute top-2 left-2 z-10")}>
-        {stock ? "In Stock" : "Out of Stock"}
-      </span>
-    </div>;
-
-  // Modern tags / chips builder
-  const tags = (
-    <div className="flex flex-wrap gap-1 text-xs text-slate-400 mb-1">
-      {category && (
-        <span className="bg-slate-700 rounded-full px-2 py-0.5">{category}</span>
-      )}
-      {brand && (
-        <span className="border border-slate-600 rounded-full px-2 py-0.5">{brand}</span>
-      )}
-      {productData?.type && !productData?.category && (
-        <span className="bg-slate-700 rounded-full px-2 py-0.5">{productData?.type}</span>
-      )}
-    </div>
-  );
-
-  // Responsive action buttons, visible for all
-  const actions = (
-    <div className="flex flex-wrap gap-2 mt-auto">
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label="Remove"
-        className="hover:bg-pink-900/60 text-pink-400"
-        onClick={onRemove}
-      >
-        <Trash2 className="w-5 h-5" />
-      </Button>
-      <Link to={detailsLink}>
-        <Button
-          variant="outline"
-          size="sm"
-          className="border-cyan-600 text-cyan-400 hover:bg-cyan-900/30"
-        >
-          <Eye className="w-4 h-4 mr-2" />
-          {view === "grid" ? "View Details" : "Details"}
-        </Button>
-      </Link>
-      <Button
-        variant="secondary"
-        size="sm"
-        className="bg-gradient-to-r from-cyan-600 to-fuchsia-600 text-white font-bold hover:from-cyan-500 hover:to-fuchsia-500"
-        disabled={!stock}
-      >
-        <ShoppingCart className="w-4 h-4 mr-2" />
-        {stock ? (view === "grid" ? "Buy Now" : "Buy") : "Unavailable"}
-      </Button>
-    </div>
-  );
-
-  return (
-    <motion.div
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      variants={{
-        initial: { opacity: 0, y: 30, scale: 0.97 },
-        animate: { opacity: 1, y: 0, scale: 1 },
-        exit: { opacity: 0, y: 60, scale: 0.95, transition: { duration: 0.35 } }
-      }}
-      layout
-      className={
-        view === "grid"
-          ? "rounded-2xl shadow-xl bg-slate-800/90 border border-slate-700 hover:shadow-2xl ring-1 ring-transparent hover:ring-fuchsia-600 transition-all duration-150 flex flex-col min-h-[420px] relative"
-          : "rounded-xl shadow-lg bg-slate-800/95 border border-slate-700 flex flex-row items-center gap-4 p-3 min-h-[110px] hover:ring-2 hover:ring-fuchsia-500 relative"
-      }
-      style={removing ? { pointerEvents: "none", opacity: 0.6 } : {}}
-    >
-      {view === "grid" ? (
-        <>
-          {/* Image Box */}
-          <div className={
-            "bg-slate-900 border border-slate-700 rounded-lg overflow-hidden flex items-center justify-center transition-transform duration-300 relative h-44 w-full mb-3"
-          }>
-            <img
-              src={image}
-              alt={title}
-              className="object-cover transition-transform duration-300 hover:scale-110 w-full h-full"
-              loading="lazy"
-            />
-            {/* Stock Badge */}
-            <span className={cn(badgeClasses(stock), "absolute top-2 left-2 z-10")}>
-              {stock ? "In Stock" : "Out of Stock"}
-            </span>
-          </div>
-          <div className="flex-1 flex flex-col gap-1 px-2 pb-2">
-            <Link
-              to={detailsLink}
-              className="hover:text-cyan-400 text-lg font-bold text-white mb-0.5 line-clamp-2"
-            >
-              {title}
-            </Link>
-            {tags}
-            <div className="flex items-center gap-2 mb-1 mt-2">
-              <span className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-fuchsia-400 text-transparent bg-clip-text">
-                ₹{price !== undefined ? new Intl.NumberFormat("en-IN").format(price) : "--"}
-              </span>
-              {getRatingStars(rating)}
-            </div>
-            {/* NEW: Description */}
-            {description && (
-              <div className="text-xs text-slate-400 mt-1 line-clamp-2">{description}</div>
-            )}
-            {actions}
-          </div>
-        </>
-      ) : (
-        <>
-          {/* Image Box */}
-          <div className="bg-slate-900 border border-slate-700 rounded-lg overflow-hidden flex items-center justify-center transition-transform duration-300 relative h-24 w-24 mr-5">
-            <img
-              src={image}
-              alt={title}
-              className="object-cover transition-transform duration-300 hover:scale-110 h-full w-full"
-              loading="lazy"
-            />
-            {/* Stock Badge */}
-            <span className={cn(badgeClasses(stock), "absolute top-2 left-2 z-10")}>
-              {stock ? "In Stock" : "Out of Stock"}
-            </span>
-          </div>
-          <div className="flex flex-1 flex-col gap-1">
-            <Link to={detailsLink} className="hover:text-cyan-400 text-base font-bold text-white">
-              {title}
-            </Link>
-            {tags}
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold bg-gradient-to-r from-cyan-400 to-fuchsia-400 text-transparent bg-clip-text">
-                ₹{price !== undefined ? new Intl.NumberFormat("en-IN").format(price) : "--"}
-              </span>
-              {getRatingStars(rating)}
-            </div>
-            {/* NEW: Description */}
-            {description && (
-              <div className="text-xs text-slate-400 mt-1 line-clamp-2">{description}</div>
-            )}
-            <div className="flex gap-2 mt-2">{actions}</div>
-          </div>
-        </>
-      )}
-    </motion.div>
   );
 }

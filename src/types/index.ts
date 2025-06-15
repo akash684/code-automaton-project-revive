@@ -90,38 +90,16 @@ export interface CartItem {
 // Wishlist types
 export interface WishlistItem {
   id: string;
-  user_id: string;
-  product_id?: number | null;
-  item_uuid?: string | null;
-  /** "product" is integer (+ possibly joined 'product'), UUIDs for vehicle/accessory */
   item_type: "product" | "vehicle" | "accessory";
+  item_uuid: string;
+  product_id?: number;
   created_at: string;
-  product?: {
-    id: number;
-    available: boolean;
-    brand?: string;
-    category?: string;
-    category_id?: number;
-    created_at?: string;
-    updated_at?: string;
-    description?: string;
-    featured?: boolean;
-    fuel?: string;
-    image_url?: string;
-    images?: string[];
-    in_stock?: boolean;
-    location?: string;
-    mileage?: number;
-    model?: string;
-    name?: string;
+  product: {
+    name: string;
     price: number;
-    price_inr?: number;
-    slug?: string;
-    specs?: any;
-    transmission?: string;
-    type?: string;
-    year?: number;
-    [extra: string]: any;
+    image_url: string;
+    in_stock?: boolean;
+    [key: string]: any;
   } | null;
 }
 
