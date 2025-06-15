@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Product } from '@/types';
@@ -8,7 +7,6 @@ import { Badge } from '@/components/ui/badge';
 import { Heart, ShoppingCart, Star, ArrowRight, Truck, Shield, Clock, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Navbar } from "@/components/ui/navbar";
 import { motion } from "framer-motion";
 
 const Index = () => {
@@ -60,7 +58,8 @@ const Index = () => {
 
   return (
     <div className="bg-gray-950 min-h-screen text-white transition-colors duration-300">
-      <Navbar onToggleDark={() => {}} />
+      {/* Removed local Navbar to fix double nav bar issue */}
+      {/* <Navbar onToggleDark={() => {}} /> */}
       <main className="container mx-auto px-4">
         {/* Hero Section (Image removed, only dark background + text/buttons) */}
         <motion.section
