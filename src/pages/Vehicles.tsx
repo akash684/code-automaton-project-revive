@@ -21,6 +21,7 @@ import { BuyModal } from "@/components/BuyModal";
 import { toast } from "sonner";
 import { useWishlist } from '@/hooks/useWishlist';
 import { Heart } from "lucide-react";
+import { DEFAULT_PRICE_RANGE } from "@/constants/price";
 
 type Product = {
   id: string | number;
@@ -58,33 +59,34 @@ export default function Vehicles() {
     queryKey: ["vehicles", filters, search, sort],
     queryFn: async () => {
       const { supabase } = await import("@/integrations/supabase/client");
+
       // Normalize filters
       const catFilter = filters.category === "all" ? null : filters.category.toLowerCase().trim();
       const brandFilter = filters.brand === "all" ? null : filters.brand.toLowerCase().trim();
       const fuelFilter = filters.fuel === "all" ? null : filters.fuel.toLowerCase().trim();
       const transFilter = filters.transmission === "all" ? null : filters.transmission.toLowerCase().trim();
 
-      let query = supabase.from<Product>("products").select("*");
+      let query = supabase.from<Product, Product>("products").select("*");
 
       if (catFilter) {
-        query = query.eq("category", catFilter);
+        query = query.eq("category" as keyof Product, catFilter);
       } else {
-        query = query.in("category", ["car", "bike"]); // Always filter for car/bike if no specific filter
+        query = query.in("category" as keyof Product, ["car", "bike"]);
       }
-      if (search) query = query.ilike("model", `%${search}%`);
-      if (sort === "price-asc") query = query.order("price", { ascending: true });
-      else if (sort === "price-desc") query = query.order("price", { ascending: false });
-      if (brandFilter) query = query.eq("brand", brandFilter);
-      if (fuelFilter) query = query.eq("fuel", fuelFilter);
-      if (transFilter) query = query.eq("transmission", transFilter);
+      if (search) query = query.ilike("model" as keyof Product, `%${search}%`);
+      if (sort === "price-asc") query = query.order("price" as keyof Product, { ascending: true });
+      else if (sort === "price-desc") query = query.order("price" as keyof Product, { ascending: false });
+      if (brandFilter) query = query.eq("brand" as keyof Product, brandFilter);
+      if (fuelFilter) query = query.eq("fuel" as keyof Product, fuelFilter);
+      if (transFilter) query = query.eq("transmission" as keyof Product, transFilter);
 
       if (
         filters.priceRange &&
         (filters.priceRange[0] !== DEFAULT_PRICE_RANGE[0] || filters.priceRange[1] !== DEFAULT_PRICE_RANGE[1])
       ) {
         query = query
-          .gte("price", filters.priceRange[0])
-          .lte("price", filters.priceRange[1]);
+          .gte("price" as keyof Product, filters.priceRange[0])
+          .lte("price" as keyof Product, filters.priceRange[1]);
       }
 
       const { data, error } = await query;
