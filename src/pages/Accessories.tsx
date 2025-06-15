@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { fetchAccessories, fetchAccessoryCategories } from "@/services/supabase/products";
 import { Input } from "@/components/ui/input";
@@ -74,7 +73,7 @@ export default function Accessories() {
                   <SelectContent>
                     <SelectItem
                       value="all"
-                      className="flex items-center text-gray-700 font-semibold"
+                      className="bg-muted text-foreground hover:bg-muted/70 data-[state=checked]:bg-accent data-[state=checked]:text-background font-semibold"
                     >
                       All Types
                     </SelectItem>
@@ -82,19 +81,7 @@ export default function Accessories() {
                       <SelectItem
                         key={cat}
                         value={cat}
-                        className={
-                          cat.toLowerCase().includes("helmet")
-                            ? "flex items-center text-blue-700 font-bold"
-                            : cat.toLowerCase().includes("gloves")
-                            ? "flex items-center text-green-700"
-                            : cat.toLowerCase().includes("jackets")
-                            ? "flex items-center text-pink-700"
-                            : cat.toLowerCase().includes("mobile")
-                            ? "flex items-center text-teal-700"
-                            : cat.toLowerCase().includes("gps")
-                            ? "flex items-center text-yellow-700"
-                            : "flex items-center"
-                        }
+                        className="bg-muted text-foreground hover:bg-muted/70 data-[state=checked]:bg-accent data-[state=checked]:text-background"
                       >
                         {cat}
                       </SelectItem>
@@ -115,9 +102,24 @@ export default function Accessories() {
                     <SelectValue placeholder="All Vehicles" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Vehicles</SelectItem>
-                    <SelectItem value="car">Car</SelectItem>
-                    <SelectItem value="bike">Bike</SelectItem>
+                    <SelectItem
+                      value="all"
+                      className="bg-muted text-foreground hover:bg-muted/70 data-[state=checked]:bg-accent data-[state=checked]:text-background"
+                    >
+                      All Vehicles
+                    </SelectItem>
+                    <SelectItem
+                      value="car"
+                      className="bg-muted text-foreground hover:bg-muted/70 data-[state=checked]:bg-accent data-[state=checked]:text-background"
+                    >
+                      Car
+                    </SelectItem>
+                    <SelectItem
+                      value="bike"
+                      className="bg-muted text-foreground hover:bg-muted/70 data-[state=checked]:bg-accent data-[state=checked]:text-background"
+                    >
+                      Bike
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -132,9 +134,24 @@ export default function Accessories() {
                     <SelectValue placeholder="All" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="true">In Stock</SelectItem>
-                    <SelectItem value="false">Out of Stock</SelectItem>
+                    <SelectItem
+                      value="all"
+                      className="bg-muted text-foreground hover:bg-muted/70 data-[state=checked]:bg-accent data-[state=checked]:text-background"
+                    >
+                      All
+                    </SelectItem>
+                    <SelectItem
+                      value="true"
+                      className="bg-muted text-foreground hover:bg-muted/70 data-[state=checked]:bg-accent data-[state=checked]:text-background"
+                    >
+                      In Stock
+                    </SelectItem>
+                    <SelectItem
+                      value="false"
+                      className="bg-muted text-foreground hover:bg-muted/70 data-[state=checked]:bg-accent data-[state=checked]:text-background"
+                    >
+                      Out of Stock
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
