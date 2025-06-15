@@ -8,6 +8,8 @@ export function ModeToggle() {
       ? document.documentElement.classList.contains("dark")
       : false
   );
+
+  // Ensure dark mode class is always synced to <html>
   useEffect(() => {
     if (dark) {
       document.documentElement.classList.add("dark");
