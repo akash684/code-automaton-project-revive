@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { fetchAccessories, fetchAccessoryCategories } from "@/services/supabase/products";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,7 @@ import { CardContent } from "@/components/ui/card";
 import { BuyModal } from "@/components/BuyModal";
 import { toast } from "sonner";
 import { useWishlist } from "@/hooks/useWishlist";
+import { Heart } from "lucide-react";
 
 export default function Accessories() {
   const [filters, setFilters] = useState({

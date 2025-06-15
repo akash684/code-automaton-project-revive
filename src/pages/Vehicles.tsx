@@ -1,3 +1,4 @@
+
 // Vehicles Page - fetches from "vehicles" table
 
 import { useQuery } from "@tanstack/react-query";
@@ -20,6 +21,7 @@ import { CardContent } from "@/components/ui/card";
 import { BuyModal } from "@/components/BuyModal";
 import { toast } from "sonner";
 import { useWishlist } from '@/hooks/useWishlist';
+import { Heart } from "lucide-react";
 
 const DEFAULT_PRICE_RANGE: [number, number] = [500, 2000000];
 
