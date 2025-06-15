@@ -1,76 +1,71 @@
 
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import { Vehicle } from "@/types/supabase";
 
+// VehicleCard styled and structured like AccessoryCard
 interface VehicleCardProps {
   vehicle: Vehicle;
 }
 
 export function VehicleCard({ vehicle }: VehicleCardProps) {
-  // Compose compatible types badges
-  const typeBadges = ["car", "bike"].filter(t => vehicle.category && vehicle.category.toLowerCase().includes(t));
-
+  // Compose badges for category, fuel, transmission for the vehicle (can adjust per project needs)
   return (
-    <div className="w-full max-w-xs rounded-2xl border border-border bg-card text-foreground shadow-md flex flex-col overflow-hidden">
-      {/* Image & badges */}
-      <div className="relative h-48 bg-background flex items-center justify-center overflow-hidden">
+    <Card className="rounded-2xl border transition-shadow bg-card text-foreground hover:shadow-lg group overflow-hidden">
+      <div className="relative w-full h-48 overflow-hidden flex items-center justify-center bg-background">
+        {/* Image */}
         <img
           src={vehicle.image_url || "/placeholder.svg"}
           alt={vehicle.brand + " " + vehicle.model}
-          className="object-contain h-40"
+          className="object-contain w-full h-full"
           loading="lazy"
         />
-        {/* Stock */}
+        {/* In stock / Unavailable badge */}
         <Badge
-          className={
-            "absolute top-3 left-3 font-semibold px-3 py-1 rounded-full z-10" +
-            (vehicle.available
-              ? " bg-success text-background"
-              : " bg-muted text-foreground")
-          }
+          className={`absolute top-3 left-3 px-3 py-1 rounded-full capitalize font-semibold z-10 ${
+            vehicle.available ? "bg-success text-background" : "bg-muted text-foreground"
+          }`}
         >
           {vehicle.available ? "In Stock" : "Unavailable"}
         </Badge>
         {/* Category */}
-        <Badge className="absolute top-3 right-3 font-semibold px-3 py-1 rounded-full bg-accent text-background z-10 capitalize">
+        <Badge className="absolute top-3 right-3 bg-accent text-background px-3 py-1 rounded-full capitalize font-semibold z-10">
           {vehicle.category}
         </Badge>
       </div>
-      {/* Details */}
-      <div className="flex flex-col flex-1 p-4 bg-background dark:bg-card">
-        {/* Name */}
-        <div className="font-heading text-lg font-bold mb-0.5">
+      <CardContent className="p-5 flex flex-col flex-1">
+        {/* Title */}
+        <div className="font-heading text-lg font-bold mb-1">
           {vehicle.brand} {vehicle.model}
         </div>
-        {/* Type/fuel/transmission badges */}
-        <div className="flex flex-wrap gap-1 text-xs mb-2">
-          {vehicle.fuel && <Badge variant="outline" className="bg-background/60 text-foreground">{vehicle.fuel}</Badge>}
-          {vehicle.transmission && (
-            <Badge variant="outline" className="bg-background/60 text-foreground">{vehicle.transmission}</Badge>
+        {/* Details badges */}
+        <div className="flex flex-wrap gap-2 text-xs text-muted mb-2">
+          {vehicle.fuel && (
+            <Badge variant="outline" className="bg-background/60 text-foreground">
+              {vehicle.fuel}
+            </Badge>
           )}
-          {/* Category as badge only if not shown as main category */}
-          {typeBadges.map(type =>
-            <Badge key={type} variant="outline" className="bg-muted text-foreground capitalize">{type}</Badge>
+          {vehicle.transmission && (
+            <Badge variant="outline" className="bg-background/60 text-foreground">
+              {vehicle.transmission}
+            </Badge>
           )}
         </div>
         {/* Price */}
-        <div className="text-2xl font-bold text-accent mb-1">
+        <div className="text-2xl font-bold text-accent mb-3">
           ₹{new Intl.NumberFormat("en-IN").format(vehicle.price)}
         </div>
-        {/* Stock (for demo we use available info only) */}
-        <div className="text-sm text-muted mb-2">
-          {vehicle.available ? "Available" : "Out of Stock"}
-        </div>
+        <div className="flex-1" />
         {/* Buy Now button */}
         <Button
-          className="mt-auto w-full font-bold bg-gradient-to-r from-indigo-500 to-fuchsia-500 text-white text-base rounded-2xl py-3 hover:from-indigo-600 hover:to-fuchsia-600 shadow"
+          className="w-full font-semibold rounded-xl py-2 mt-2"
           disabled={!vehicle.available}
         >
-          Buy Now
+          {vehicle.available ? "Buy Now" : "Unavailable"}
         </Button>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
