@@ -1,6 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
 import { AnimatedEmpty } from "@/components/ui/animated-empty";
@@ -9,8 +9,8 @@ import { toast } from "sonner";
 import { DEFAULT_PRICE_RANGE } from "@/constants/price";
 import type { Database } from "@/integrations/supabase/types";
 
-// Use your Supabase-generated types:
-type VehicleRow = Database['public']['Tables']['vehicles']['Row'];
+// Correct VehicleRow based on your schema
+type VehicleRow = Database["public"]["Tables"]["vehicles"]["Row"];
 
 export default function Vehicles() {
   // Filters and price range state
@@ -18,16 +18,16 @@ export default function Vehicles() {
     category: "all",
     brand: "all",
     fuel: "all",
-    transmission: "all"
+    transmission: "all",
   });
   const [priceRange, setPriceRange] = useState<[number, number]>(DEFAULT_PRICE_RANGE);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState("price-asc");
 
-  // --- Fetch logic for vehicles from the "vehicle" table ---
+  // --- Fetch logic for vehicles from the "vehicles" table ---
   const vehiclesQuery = useQuery({
     queryKey: ["vehicles", filters, search, sort, priceRange],
-    queryFn: async () => {
+    queryFn: async (): Promise<VehicleRow[]> => {
       const { supabase } = await import("@/integrations/supabase/client");
 
       // Normalize filters for the DB
@@ -36,46 +36,48 @@ export default function Vehicles() {
       const fuelFilter = filters.fuel === "all" ? null : filters.fuel.toLowerCase().trim();
       const transFilter = filters.transmission === "all" ? null : filters.transmission.toLowerCase().trim();
 
-      let query = supabase.from<VehicleRow>("vehicles").select("*");
+      // Correct: from<T, R>(table: string)
+      let query = supabase.from<VehicleRow, VehicleRow>("vehicles").select("*");
 
       if (catFilter) {
-        query = query.eq("category" as keyof VehicleRow, catFilter);
+        query = query.eq("category", catFilter);
       } else {
-        query = query.in("category" as keyof VehicleRow, ["car", "bike"]);
+        // Note: category value is a string on schema, so use an array of strings
+        query = query.in("category", ["car", "bike"]);
       }
 
-      if (search) query = query.ilike("model" as keyof VehicleRow, `%${search}%`);
-      if (sort === "price-asc") query = query.order("price" as keyof VehicleRow, { ascending: true });
-      else if (sort === "price-desc") query = query.order("price" as keyof VehicleRow, { ascending: false });
+      if (search) query = query.ilike("model", `%${search}%`);
+      if (sort === "price-asc") {
+        query = query.order("price", { ascending: true });
+      } else if (sort === "price-desc") {
+        query = query.order("price", { ascending: false });
+      }
 
-      if (brandFilter) query = query.eq("brand" as keyof VehicleRow, brandFilter);
-      if (fuelFilter) query = query.eq("fuel" as keyof VehicleRow, fuelFilter);
-      if (transFilter) query = query.eq("transmission" as keyof VehicleRow, transFilter);
+      if (brandFilter) query = query.eq("brand", brandFilter);
+      if (fuelFilter) query = query.eq("fuel", fuelFilter);
+      if (transFilter) query = query.eq("transmission", transFilter);
 
-      // Apply price range
+      // Apply price range only if not at defaults
       if (
         priceRange &&
         (priceRange[0] !== DEFAULT_PRICE_RANGE[0] || priceRange[1] !== DEFAULT_PRICE_RANGE[1])
       ) {
-        query = query
-          .gte("price" as keyof VehicleRow, priceRange[0])
-          .lte("price" as keyof VehicleRow, priceRange[1]);
+        query = query.gte("price", priceRange[0]).lte("price", priceRange[1]);
       }
 
       const { data, error } = await query;
 
       if (error) {
         console.error("Failed to fetch vehicles:", error.message);
+        toast.error("Failed to load vehicles!");
         return [];
       }
       if (!data || data.length === 0) {
         toast.info("No cars or bikes found. Check filters or Supabase policy.");
       }
 
-      // You may temporarily use:
-      // console.table(data);
       return data ?? [];
-    }
+    },
   });
 
   // Reset all filters
@@ -84,14 +86,13 @@ export default function Vehicles() {
       category: "all",
       brand: "all",
       fuel: "all",
-      transmission: "all"
+      transmission: "all",
     });
     setPriceRange(DEFAULT_PRICE_RANGE);
     setSearch("");
     setSort("price-asc");
   };
 
-  // Rendering UI – main structure simplified for clarity here.
   return (
     <div className="bg-background min-h-screen text-foreground">
       <main className="container mx-auto py-10">
@@ -124,7 +125,7 @@ export default function Vehicles() {
                   placeholder="All Brands"
                   onChange={e => setFilters(f => ({
                     ...f,
-                    brand: e.target.value.trim() || "all"
+                    brand: e.target.value.trim() || "all",
                   }))}
                 />
               </div>
@@ -136,7 +137,7 @@ export default function Vehicles() {
                   placeholder="All Fuels"
                   onChange={e => setFilters(f => ({
                     ...f,
-                    fuel: e.target.value.trim() || "all"
+                    fuel: e.target.value.trim() || "all",
                   }))}
                 />
               </div>
@@ -148,11 +149,11 @@ export default function Vehicles() {
                   placeholder="All Transmissions"
                   onChange={e => setFilters(f => ({
                     ...f,
-                    transmission: e.target.value.trim() || "all"
+                    transmission: e.target.value.trim() || "all",
                   }))}
                 />
               </div>
-              {/* Price with Slider */}
+              {/* Price with Sliders */}
               <div>
                 <div className="font-medium mb-1">Price</div>
                 <input
@@ -209,7 +210,6 @@ export default function Vehicles() {
               <div className="py-32 text-center text-error">Error loading vehicles.</div>
             ) : vehiclesQuery.data?.length ? (
               <div>
-                {/* Render your list of vehicles here */}
                 {vehiclesQuery.data.map(vehicle => (
                   <div key={vehicle.id} className="p-4 mb-4 rounded-lg border bg-card">
                     <div className="font-bold">{vehicle.brand} {vehicle.model}</div>
@@ -229,3 +229,4 @@ export default function Vehicles() {
     </div>
   );
 }
+// ... end of file
