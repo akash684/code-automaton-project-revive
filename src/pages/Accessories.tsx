@@ -209,14 +209,6 @@ export default function Accessories() {
                       <div className="text-sm text-gray-800 mb-2">Stock: {accessory.stock}</div>
                       <div className="flex gap-2">
                         <Button
-                          className="flex-1"
-                          variant="outline"
-                          disabled={!accessory.available}
-                          onClick={() => { toast.success('Rent flow coming soon!'); }}
-                        >
-                          Rent Now
-                        </Button>
-                        <Button
                           className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
                           disabled={!accessory.available}
                           onClick={() => {

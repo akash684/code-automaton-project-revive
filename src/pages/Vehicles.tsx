@@ -250,14 +250,6 @@ export default function Vehicles() {
                       </div>
                       <div className="flex gap-2">
                         <Button
-                          className="flex-1"
-                          disabled={!vehicle.available}
-                          variant="outline"
-                          onClick={() => { toast.success('Rent flow coming soon!'); }}
-                        >
-                          Rent Now
-                        </Button>
-                        <Button
                           className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white"
                           disabled={!vehicle.available}
                           onClick={() => {
