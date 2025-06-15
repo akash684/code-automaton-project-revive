@@ -15,13 +15,30 @@ import BuyModal from "@/components/BuyModal";
 // Correct VehicleRow based on your schema
 type VehicleRow = Database["public"]["Tables"]["vehicles"]["Row"];
 
+// Helper: Brand, Fuel, Transmission options fetching
+const useDistinctValues = (column: string) => {
+  return useQuery({
+    queryKey: ["vehicles", column],
+    queryFn: async () => {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data, error } = await supabase.from("vehicles").select(column);
+      if (error) return [];
+      const vals = (data ?? [])
+        .map((row: any) => row[column])
+        .filter(Boolean)
+        .map((val: string) => val.trim());
+      return Array.from(new Set(vals));
+    },
+  });
+};
+
 export default function Vehicles() {
   // Filters and price range state
   const [filters, setFilters] = useState({
-    category: "all",
-    brand: "all",
-    fuel: "all",
-    transmission: "all",
+    category: "all",         // Type: car | bike | all
+    brand: "all",            // Brand (from DB)
+    fuel: "all",             // Fuel type (from DB)
+    transmission: "all",     // Transmission type (from DB)
   });
   const [priceRange, setPriceRange] = useState<[number, number]>(DEFAULT_PRICE_RANGE);
   const [search, setSearch] = useState("");
@@ -31,20 +48,24 @@ export default function Vehicles() {
   const [buyModalOpen, setBuyModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<{ name: string; price: number; image_url: string } | null>(null);
 
+  // Fetch distinct filter options from vehicles
+  const brandOptionsQuery = useDistinctValues("brand");
+  const fuelOptionsQuery = useDistinctValues("fuel");
+  const transmissionOptionsQuery = useDistinctValues("transmission");
+
   // --- Fetch logic for vehicles from the "vehicles" table ---
   const vehiclesQuery = useQuery({
     queryKey: ["vehicles", filters, search, sort, priceRange],
     queryFn: async (): Promise<Vehicle[]> => {
       const { supabase } = await import("@/integrations/supabase/client");
 
-      // Normalize filters for the DB
-      const catFilter = filters.category !== "all" && filters.category !== "" ? filters.category.trim() : null;
-      const brandFilter = filters.brand !== "all" && filters.brand !== "" ? filters.brand.trim() : null;
-      const fuelFilter = filters.fuel !== "all" && filters.fuel !== "" ? filters.fuel.trim() : null;
-      const transFilter = filters.transmission !== "all" && filters.transmission !== "" ? filters.transmission.trim() : null;
+      // Normalize filters for DB
+      const catFilter = filters.category !== "all" ? filters.category : null;
+      const brandFilter = filters.brand !== "all" ? filters.brand : null;
+      const fuelFilter = filters.fuel !== "all" ? filters.fuel : null;
+      const transFilter = filters.transmission !== "all" ? filters.transmission : null;
 
       let query = supabase.from("vehicles").select("*");
-
       if (catFilter) query = query.eq("category", catFilter);
       if (brandFilter) query = query.eq("brand", brandFilter);
       if (fuelFilter) query = query.eq("fuel", fuelFilter);
@@ -54,7 +75,7 @@ export default function Vehicles() {
       if (sort === "price-asc") query = query.order("price", { ascending: true });
       else if (sort === "price-desc") query = query.order("price", { ascending: false });
 
-      // Apply price range filter if different from default
+      // Apply price range filter
       if (
         priceRange &&
         (priceRange[0] !== DEFAULT_PRICE_RANGE[0] || priceRange[1] !== DEFAULT_PRICE_RANGE[1])
@@ -63,14 +84,13 @@ export default function Vehicles() {
       }
 
       const { data, error } = await query;
-
       if (error) {
         console.error("Failed to fetch vehicles:", error.message);
         toast.error("Failed to load vehicles!");
         return [];
       }
       if (!Array.isArray(data) || !data) {
-        toast.info("No cars or bikes found. Check filters or Supabase policy.");
+        toast.info("No vehicles found. Check filters or Supabase policy.");
         return [];
       }
       return data as Vehicle[];
@@ -90,92 +110,137 @@ export default function Vehicles() {
     setSort("price-asc");
   };
 
-  // Helpers for cleaner UI logic
-  const handleFilterChange = (key: keyof typeof filters, value: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      [key]: value === "" ? "all" : value,
-    }));
-  };
-
   return (
     <div className="bg-background min-h-screen text-foreground">
       <main className="container mx-auto py-10">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar */}
           <aside className="md:w-72 mb-4 shrink-0">
-            {/* Vehicle Type */}
-            <div>
-              <div className="font-medium mb-1">Type</div>
-              <Select
-                value={filters.category}
-                onValueChange={v => handleFilterChange("category", v)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="All Types" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="car">Car</SelectItem>
-                  <SelectItem value="bike">Bike</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            {/* Brand */}
-            <div>
-              <div className="font-medium mb-1">Brand</div>
-              <Input
-                value={filters.brand === "all" ? "" : filters.brand}
-                placeholder="All Brands"
-                onChange={e => handleFilterChange("brand", e.target.value)}
-              />
-            </div>
-            {/* Fuel */}
-            <div>
-              <div className="font-medium mb-1">Fuel</div>
-              <Input
-                value={filters.fuel === "all" ? "" : filters.fuel}
-                placeholder="All Fuels"
-                onChange={e => handleFilterChange("fuel", e.target.value)}
-              />
-            </div>
-            {/* Transmission */}
-            <div>
-              <div className="font-medium mb-1">Transmission</div>
-              <Input
-                value={filters.transmission === "all" ? "" : filters.transmission}
-                placeholder="All Transmissions"
-                onChange={e => handleFilterChange("transmission", e.target.value)}
-              />
-            </div>
-            {/* Price with Sliders */}
-            <div>
-              <div className="font-medium mb-1">Price</div>
-              <input
-                type="range"
-                min={DEFAULT_PRICE_RANGE[0]}
-                max={DEFAULT_PRICE_RANGE[1]}
-                value={priceRange[0]}
-                onChange={e => setPriceRange(pr => [Number(e.target.value), pr[1]])}
-                className="w-full"
-              />
-              <input
-                type="range"
-                min={DEFAULT_PRICE_RANGE[0]}
-                max={DEFAULT_PRICE_RANGE[1]}
-                value={priceRange[1]}
-                onChange={e => setPriceRange(pr => [pr[0], Number(e.target.value)])}
-                className="w-full"
-              />
-              <div className="flex justify-between text-xs mt-1">
-                <span>₹{priceRange[0]}</span>
-                <span>₹{priceRange[1]}</span>
+            <div className="space-y-6 p-6 rounded-2xl bg-card text-foreground border border-border shadow">
+              {/* Type (Category) */}
+              <div>
+                <div className="font-medium mb-1">Type</div>
+                <Select
+                  value={filters.category}
+                  onValueChange={(v) => setFilters(f => ({ ...f, category: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem // Use custom styles for selected
+                      value="all"
+                      className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-primary data-[state=checked]:text-white font-semibold"
+                    >
+                      All Types
+                    </SelectItem>
+                    <SelectItem
+                      value="car"
+                      className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-primary data-[state=checked]:text-white"
+                    >
+                      Car
+                    </SelectItem>
+                    <SelectItem
+                      value="bike"
+                      className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-primary data-[state=checked]:text-white"
+                    >
+                      Bike
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+              {/* Brand */}
+              <div>
+                <div className="font-medium mb-1">Brand</div>
+                <Select
+                  value={filters.brand}
+                  onValueChange={(v) => setFilters(f => ({ ...f, brand: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Brands" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem
+                      value="all"
+                      className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-primary data-[state=checked]:text-white"
+                    >
+                      All Brands
+                    </SelectItem>
+                    {brandOptionsQuery.data?.map((brand: string) => (
+                      <SelectItem
+                        key={brand}
+                        value={brand}
+                        className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-primary data-[state=checked]:text-white"
+                      >
+                        {brand}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {/* Fuel */}
+              <div>
+                <div className="font-medium mb-1">Fuel</div>
+                <Select
+                  value={filters.fuel}
+                  onValueChange={(v) => setFilters(f => ({ ...f, fuel: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Fuels" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem
+                      value="all"
+                      className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-primary data-[state=checked]:text-white"
+                    >
+                      All Fuels
+                    </SelectItem>
+                    {fuelOptionsQuery.data?.map((fuel: string) => (
+                      <SelectItem
+                        key={fuel}
+                        value={fuel}
+                        className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-primary data-[state=checked]:text-white"
+                      >
+                        {fuel}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {/* Transmission */}
+              <div>
+                <div className="font-medium mb-1">Transmission</div>
+                <Select
+                  value={filters.transmission}
+                  onValueChange={(v) => setFilters(f => ({ ...f, transmission: v }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Transmissions" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem
+                      value="all"
+                      className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-primary data-[state=checked]:text-white"
+                    >
+                      All Transmissions
+                    </SelectItem>
+                    {transmissionOptionsQuery.data?.map((tr: string) => (
+                      <SelectItem
+                        key={tr}
+                        value={tr}
+                        className="bg-[#0D1B3C] text-white hover:bg-[#132347] data-[state=checked]:bg-primary data-[state=checked]:text-white"
+                      >
+                        {tr}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {/* Reset Filters */}
+              <Button variant="outline" className="w-full mt-3" onClick={handleReset}>
+                Reset Filters
+              </Button>
             </div>
-            {/* Reset Filters */}
-            <Button className="mt-3 w-full" variant="outline" onClick={handleReset}>
-              Reset Filters
-            </Button>
           </aside>
           {/* Main content */}
           <section className="flex-1 min-w-0">
