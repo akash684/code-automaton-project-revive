@@ -54,7 +54,7 @@ export const useWishlist = () => {
           vehicles:vehicles(*),
           accessories:accessories(*)
         `)
-        .eq("user_id", user.id);
+        .eq("user_id", String(user.id)); // ensure user_id is a string
 
       if (error) throw error;
 
@@ -133,13 +133,13 @@ export const useWishlist = () => {
       }
       // For Partial<WishlistItem> & {user_id}, casting is now correct
       const insertData: Partial<WishlistItemType> & { user_id?: string } = {
-        user_id: user.id,
+        user_id: String(user.id),
         item_type: itemType,
       };
       if (itemType === 'product' && typeof itemId === 'number') {
-        insertData.product_id = itemId;
+        insertData.product_id = Number(itemId);
       } else if ((itemType === 'vehicle' || itemType === 'accessory') && typeof itemId === 'string') {
-        insertData.item_uuid = itemId;
+        insertData.item_uuid = String(itemId);
       } else {
         toast.error('Invalid item type or ID');
         return false;
@@ -171,11 +171,11 @@ export const useWishlist = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return false;
 
-      let query = supabase.from('wishlist').delete().eq('user_id', user.id).eq('item_type', itemType);
+      let query = supabase.from('wishlist').delete().eq('user_id', String(user.id)).eq('item_type', itemType);
       if (itemType === 'product' && typeof itemId === 'number') {
-        query = query.eq('product_id', itemId);
+        query = query.eq('product_id', Number(itemId));
       } else if ((itemType === 'vehicle' || itemType === 'accessory') && typeof itemId === 'string') {
-        query = query.eq('item_uuid', itemId);
+        query = query.eq('item_uuid', String(itemId));
       } else {
         toast.error('Invalid item type or ID');
         return false;
@@ -203,10 +203,10 @@ export const useWishlist = () => {
         : "accessory";
 
     if (itemType === 'product' && typeof itemId === 'number') {
-      return wishlistItems.some(item => item.product_id === itemId && item.item_type === 'product');
+      return wishlistItems.some(item => item.product_id === Number(itemId) && item.item_type === 'product');
     }
     if ((itemType === 'vehicle' || itemType === 'accessory') && typeof itemId === 'string') {
-      return wishlistItems.some(item => item.item_uuid === itemId && item.item_type === itemType);
+      return wishlistItems.some(item => item.item_uuid === String(itemId) && item.item_type === itemType);
     }
     return false;
   };
