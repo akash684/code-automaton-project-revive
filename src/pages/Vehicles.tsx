@@ -79,12 +79,12 @@ export default function Vehicles() {
   };
 
   return (
-    <div className="bg-gray-950 min-h-screen text-white">
+    <div className="bg-background min-h-screen text-foreground">
       <main className="container mx-auto py-10">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar */}
           <aside className="md:w-72 mb-4 shrink-0">
-            <div className="space-y-6 p-6 rounded-2xl shadow bg-white/70 dark:bg-gray-900/50 backdrop-blur-lg">
+            <div className="space-y-6 p-6 rounded-2xl bg-card text-foreground border border-border shadow backdrop-blur-lg">
               {/* Vehicle Type */}
               <div>
                 <div className="font-medium mb-1">Type</div>
@@ -214,13 +214,13 @@ export default function Vehicles() {
             </div>
             {/* Loading/Empty/Results */}
             {vehiclesQuery.isLoading ? (
-              <div className="py-32 text-center text-gray-500 animate-pulse">Loading...</div>
+              <div className="py-32 text-center text-muted animate-pulse">Loading...</div>
             ) : vehiclesQuery.isError ? (
-              <div className="py-32 text-center text-red-500">Error loading vehicles.</div>
+              <div className="py-32 text-center text-error">Error loading vehicles.</div>
             ) : vehiclesQuery.data?.length ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                 {vehiclesQuery.data.map((vehicle: any) => (
-                  <ModernCard key={vehicle.id} className="overflow-hidden">
+                  <div key={vehicle.id} className="overflow-hidden bg-card text-foreground border border-border rounded-2xl transition-shadow hover:shadow-lg">
                     <motion.div
                       className="relative w-full h-44 overflow-hidden"
                       whileHover={{ scale: 1.05 }}
@@ -288,7 +288,7 @@ export default function Vehicles() {
                         </Button>
                       </div>
                     </CardContent>
-                  </ModernCard>
+                  </div>
                 ))}
                 <BuyModal
                   open={buyModalOpen}
